@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pricing-tool-demo.local/schemas/plan.schema.json",
+  "title": "Execution Plan",
+  "description": "What the system decided to do",
+  "type": "object",
+  "required": ["plan_id", "request_id", "created_at", "slices"],
+  "additionalProperties": false,
+  "properties": {
+    "plan_id": {
+      "type": "string",
+      "description": "Unique plan identifier",
+      "pattern": "^PLAN-[a-zA-Z0-9_-]+$"
+    },
+    "request_id": {
+      "type": "string",
+      "description": "Reference to original request"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "strategy": {
+      "type": "string",
+      "description": "Planning strategy used",
+      "enum": ["simple", "optimized", "fallback"],
+      "default": "simple"
+    },
+    "slices": {
+      "type": "array",
+      "description": "Independently executable work units",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["slice_id", "deliverable", "files", "verification"],
+        "properties": {
+          "slice_id": {
+            "type": "string",
+            "pattern": "^SLICE-[0-9]+$"
+          },
+          "depends_on": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Slice IDs that must complete first"
+          },
+          "deliverable": {
+            "type": "string",
+            "description": "What this slice produces"
+          },
+          "files": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Files to create or modify"
+          },
+          "verification": {
+            "type": "string",
+            "description": "How to verify this slice"
+          },
+          "exit_criteria": {
+            "type": "string",
+            "description": "When this slice is considered done"
+          },
+          "estimated_effort": {
+            "type": "string",
+            "enum": ["small", "medium", "large"],
+            "description": "Relative size"
+          }
+        }
+      }
+    },
+    "resources_needed": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "External resources required"
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "description": { "type": "string" },
+          "mitigation": { "type": "string" },
+          "impact": { "enum": ["low", "medium", "high"] }
+        }
+      }
+    }
+  }
+}

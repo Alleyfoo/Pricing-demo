@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pricing-tool-demo.local/schemas/run.schema.json",
+  "title": "Run Artifact",
+  "description": "Audit bundle capturing what happened for reproducibility",
+  "type": "object",
+  "required": ["run_id", "request_id", "started_at", "completed_at", "phases"],
+  "additionalProperties": false,
+  "properties": {
+    "run_id": {
+      "type": "string",
+      "pattern": "^RUN-[a-zA-Z0-9_-]+$"
+    },
+    "request_id": {
+      "type": "string"
+    },
+    "plan_id": {
+      "type": "string"
+    },
+    "output_id": {
+      "type": "string"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "elapsed_ms": {
+      "type": "integer",
+      "description": "Total execution time in milliseconds"
+    },
+    "environment": {
+      "type": "object",
+      "properties": {
+        "version": { "type": "string" },
+        "platform": { "type": "string" },
+        "python_version": { "type": "string" },
+        "git_commit": { "type": "string" }
+      }
+    },
+    "phases": {
+      "type": "array",
+      "description": "Execution phases with timing and results",
+      "items": {
+        "type": "object",
+        "properties": {
+          "phase": {
+            "type": "string",
+            "enum": ["input", "normalization", "planning", "execution", "output"]
+          },
+          "started_at": { "type": "string", "format": "date-time" },
+          "completed_at": { "type": "string", "format": "date-time" },
+          "elapsed_ms": { "type": "integer" },
+          "status": { "enum": ["success", "failure", "skipped"] },
+          "artifacts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": { "type": "string" },
+                "path": { "type": "string" },
+                "checksum": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "validation_results": {
+      "type": "object",
+      "properties": {
+        "input_valid": { "type": "boolean" },
+        "plan_valid": { "type": "boolean" },
+        "output_valid": { "type": "boolean" }
+      }
+    },
+    "reproducibility": {
+      "type": "object",
+      "description": "Information needed to reproduce this run",
+      "properties": {
+        "random_seed": { "type": "integer" },
+        "config_hash": { "type": "string" },
+        "input_hash": { "type": "string" }
+      }
+    }
+  }
+}

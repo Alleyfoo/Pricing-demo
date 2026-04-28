@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pricing-tool-demo.local/schemas/normalized_request.schema.json",
+  "title": "Normalized Request",
+  "description": "Canonical internal representation after defaults and aliases resolved",
+  "type": "object",
+  "required": ["request_id", "normalized_at", "payload"],
+  "additionalProperties": false,
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "description": "Original request identifier"
+    },
+    "normalized_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When normalization occurred"
+    },
+    "source": {
+      "type": "string",
+      "enum": ["cli", "api", "webhook", "file"],
+      "description": "Confirmed source"
+    },
+    "payload": {
+      "type": "object",
+      "description": "Normalized payload with defaults applied",
+      "additionalProperties": true
+    },
+    "resolved_defaults": {
+      "type": "array",
+      "description": "Which defaults were applied",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field": { "type": "string" },
+          "default_value": {},
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "resolved_aliases": {
+      "type": "array",
+      "description": "Which aliases were expanded",
+      "items": {
+        "type": "object",
+        "properties": {
+          "alias": { "type": "string" },
+          "expanded_to": { "type": "string" }
+        }
+      }
+    },
+    "validation_passed": {
+      "type": "boolean",
+      "description": "Whether input validation succeeded"
+    },
+    "validation_errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "field": { "type": "string" },
+          "message": { "type": "string" }
+        }
+      }
+    }
+  }
+}

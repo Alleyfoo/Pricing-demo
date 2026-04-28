@@ -1,0 +1,77 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pricing-tool-demo.local/schemas/output.schema.json",
+  "title": "Output",
+  "description": "User-visible result",
+  "type": "object",
+  "required": ["output_id", "request_id", "status", "produced_at"],
+  "additionalProperties": false,
+  "properties": {
+    "output_id": {
+      "type": "string",
+      "pattern": "^OUT-[a-zA-Z0-9_-]+$"
+    },
+    "request_id": {
+      "type": "string",
+      "description": "Reference to original request"
+    },
+    "plan_id": {
+      "type": "string",
+      "description": "Reference to plan that generated this"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["success", "partial", "failure"],
+      "description": "Overall result status"
+    },
+    "produced_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "result": {
+      "type": "object",
+      "description": "The actual output data",
+      "additionalProperties": true
+    },
+    "artifacts": {
+      "type": "array",
+      "description": "Files produced",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": { "type": "string" },
+          "type": { "type": "string" },
+          "size_bytes": { "type": "integer" }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" },
+          "context": { "type": "object" }
+        }
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": { "type": "string" },
+          "message": { "type": "string" },
+          "slice_id": { "type": "string" },
+          "recoverable": { "type": "boolean" }
+        }
+      }
+    },
+    "next_steps": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Suggested follow-up actions"
+    }
+  }
+}

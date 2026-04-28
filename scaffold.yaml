@@ -1,0 +1,19 @@
+﻿# Agentic Scaffold Configuration
+# Replace all {{placeholders}} when initializing a new project
+
+project_name: "Pricing Demo"
+project_slug: "pricing-tool-demo"
+default_area: "App"
+
+# Workflow settings
+review_mode: "solo"              # solo, pair, team
+capability_profile: "files_search_shell_edit"  # files_search_shell_edit
+workflow_mode: "docs_only"            # docs_only, ide_executable
+
+# Feature toggles
+memory_mode: "index"                # none, index
+schema_mode: "json-schema"                # none, json-schema
+
+# Version tracking
+scaffold_version: "1.0.0"
+project_version: "0.1.0"

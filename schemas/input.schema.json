@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://pricing-tool-demo.local/schemas/input.schema.json",
+  "title": "Input",
+  "description": "Public input surface for Pricing Demo",
+  "type": "object",
+  "required": ["request_id"],
+  "additionalProperties": false,
+  "properties": {
+    "request_id": {
+      "type": "string",
+      "description": "Unique request identifier",
+      "pattern": "^[a-zA-Z0-9_-]+$"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Request timestamp (ISO 8601)"
+    },
+    "source": {
+      "type": "string",
+      "enum": ["cli", "api", "webhook", "file"],
+      "description": "How this request originated"
+    },
+    "payload": {
+      "type": "object",
+      "description": "Request-specific data",
+      "additionalProperties": true
+    },
+    "options": {
+      "type": "object",
+      "description": "Processing options",
+      "properties": {
+        "dry_run": {
+          "type": "boolean",
+          "default": false,
+          "description": "Validate without executing"
+        },
+        "verbose": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable detailed logging"
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional context",
+      "properties": {
+        "user_id": { "type": "string" },
+        "session_id": { "type": "string" },
+        "client_version": { "type": "string" }
+      }
+    }
+  }
+}
