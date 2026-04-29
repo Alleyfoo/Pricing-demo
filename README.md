@@ -6,7 +6,7 @@ The prototype is not a real pricing tool and does not predict actual prices. The
 
 ## Live Demo
 
-> Deploy URL goes here after publishing to Streamlit Community Cloud.
+> **[https://pricing-demo-tqkkfbfbw8p7unffnfgjft.streamlit.app](https://pricing-demo-tqkkfbfbw8p7unffnfgjft.streamlit.app)**
 
 ## What It Shows
 
