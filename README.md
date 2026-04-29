@@ -4,14 +4,19 @@ This is a Streamlit prototype for a service-pricing automation concept. It is bu
 
 The prototype is not a real pricing tool and does not predict actual prices. The historical data is synthetic, and the model demonstrates structure and workflow rather than operational pricing accuracy.
 
+## Live Demo
+
+> Deploy URL goes here after publishing to Streamlit Community Cloud.
+
 ## What It Shows
 
 - Service quote automation from structured job inputs.
-- Pricing drivers such as service type, region, season, complexity, material estimate, labour hours, risk, and margin.
-- Transparent rule-based service costing alongside a historical-data model.
-- A recommended service quote that blends historical reference data with calculation logic.
-- Manual review rules when the calculated result needs human judgement.
-- JSON handoff for tools such as Power Automate, n8n, Azure Functions, or a manual review queue.
+- Pricing drivers: service type, region, season, complexity, material estimate, labour hours, risk, and margin.
+- Transparent rule-based service costing alongside a historical-data ML model.
+- A recommended quote that blends historical reference data, calculation logic, and competitor market pricing.
+- **Market Intel layer** — synthetic competitor price feed shows market position (above / at / below market) and pulls the recommendation toward market median based on a configurable weight.
+- Manual review flag when model and catalog diverge by more than 18%.
+- Simulated automation handoff — shows the outbound JSON payload and a mock agent acknowledgement response.
 - A business-facing flow that sales and quotation teams could understand, test, and improve.
 
 ## Screenshots

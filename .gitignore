@@ -19,6 +19,9 @@ ENV/
 .DS_Store
 Thumbs.db
 
+# Design source files (not part of deployed app)
+design/
+
 # Project-specific
 *.log
 .cache/
