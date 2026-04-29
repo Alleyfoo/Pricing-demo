@@ -19,17 +19,6 @@ The prototype is not a real pricing tool and does not predict actual prices. The
 - Simulated automation handoff — shows the outbound JSON payload and a mock agent acknowledgement response.
 - A business-facing flow that sales and quotation teams could understand, test, and improve.
 
-## Screenshots
-
-Add screenshots here after running the app.
-
-Suggested captures:
-
-1. `docs/screenshots/price-suggestion.png` - price band, recommendation, and service calculation build-up.
-2. `docs/screenshots/data-foundation.png` - data sources, quality checks, and automation targets.
-3. `docs/screenshots/why-this-price.png` - pricing drivers and recommendation comparison.
-4. `docs/screenshots/automation-plan.png` - JSON handoff and review rule output.
-
 ```md
 ![Price suggestion](docs/screenshots/price-suggestion.png)
 ![Data foundation](docs/screenshots/data-foundation.png)
