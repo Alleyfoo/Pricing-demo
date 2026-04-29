@@ -2,7 +2,7 @@
 
 This is a Streamlit prototype for a service-pricing automation concept. It is built as a practical proof point for a Pricing & Cloud Automation Specialist application: how service quote data could be structured, calculated, reviewed, and handed off into automation.
 
-The prototype is not a real Caverion pricing tool and does not predict actual Caverion prices. The historical data is synthetic, and the model demonstrates structure and workflow rather than operational pricing accuracy.
+The prototype is not a real pricing tool and does not predict actual prices. The historical data is synthetic, and the model demonstrates structure and workflow rather than operational pricing accuracy.
 
 ## What It Shows
 
