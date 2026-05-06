@@ -27,6 +27,7 @@ st.html(
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&display=block" rel="stylesheet">
 <style>
 :root {
   --ink:        #0A1F24;
@@ -63,18 +64,23 @@ header[data-testid="stHeader"] { background: var(--paper) !important; border-bot
   border-right: 1px solid var(--ink-3) !important;
 }
 [data-testid="stSidebar"] * { color: var(--paper) !important; font-family: var(--sans) !important; }
-[data-testid="stSidebar"] .material-symbols-rounded,
-[data-testid="stSidebar"] .material-symbols-outlined,
-[data-testid="stSidebar"] .material-icons {
+span[class*="material-symbols"],
+i[class*="material-icons"],
+.material-symbols-rounded,
+.material-symbols-outlined,
+.material-icons {
   font-family: "Material Symbols Rounded", "Material Symbols Outlined", "Material Icons" !important;
   font-weight: normal !important;
   font-style: normal !important;
+  font-size: 20px !important;
   line-height: 1 !important;
   letter-spacing: normal !important;
   text-transform: none !important;
   white-space: nowrap !important;
   word-wrap: normal !important;
   direction: ltr !important;
+  font-feature-settings: "liga" !important;
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24 !important;
   -webkit-font-feature-settings: "liga" !important;
   -webkit-font-smoothing: antialiased !important;
 }
