@@ -1,7 +1,9 @@
 import json
+import hashlib
 import math
 import time as _time
 from dataclasses import dataclass
+from datetime import date, timedelta
 
 import numpy as np
 import pandas as pd
@@ -12,7 +14,12 @@ from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.preprocessing import OneHotEncoder
 
-st.set_page_config(page_title="Pricing Demo", layout="wide")
+try:
+    from prophet import Prophet
+except Exception:
+    Prophet = None
+
+st.set_page_config(page_title="Service Pricing Automation Demo", layout="wide")
 
 # ── Design system CSS ─────────────────────────────────────────────────────────
 st.html(
@@ -56,6 +63,21 @@ header[data-testid="stHeader"] { background: var(--paper) !important; border-bot
   border-right: 1px solid var(--ink-3) !important;
 }
 [data-testid="stSidebar"] * { color: var(--paper) !important; font-family: var(--sans) !important; }
+[data-testid="stSidebar"] .material-symbols-rounded,
+[data-testid="stSidebar"] .material-symbols-outlined,
+[data-testid="stSidebar"] .material-icons {
+  font-family: "Material Symbols Rounded", "Material Symbols Outlined", "Material Icons" !important;
+  font-weight: normal !important;
+  font-style: normal !important;
+  line-height: 1 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  white-space: nowrap !important;
+  word-wrap: normal !important;
+  direction: ltr !important;
+  -webkit-font-feature-settings: "liga" !important;
+  -webkit-font-smoothing: antialiased !important;
+}
 [data-testid="stSidebar"] h1,
 [data-testid="stSidebar"] h2,
 [data-testid="stSidebar"] h3 {
@@ -72,12 +94,14 @@ header[data-testid="stHeader"] { background: var(--paper) !important; border-bot
   font-size: 13px !important;
   color: var(--paper) !important;
 }
-[data-testid="stSidebar"] .stSlider [data-testid="stThumbValue"],
 [data-testid="stSidebar"] .stSlider [data-testid="stTickBarMin"],
 [data-testid="stSidebar"] .stSlider [data-testid="stTickBarMax"] {
   font-family: var(--mono) !important;
   font-size: 12px !important;
   color: var(--teal-bright) !important;
+}
+[data-testid="stSidebar"] .stSlider [data-testid="stThumbValue"] {
+  display: none !important;
 }
 [data-testid="stSidebar"] .stSlider > div > div > div {
   background: var(--teal-bright) !important;
@@ -272,6 +296,15 @@ h3 {
 .dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--teal); margin-right: 5px; vertical-align: middle; animation: pulse 2s infinite; }
 @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
 .band-container { position: relative; height: 80px; background: linear-gradient(to right, var(--paper-3) 0%, var(--paper-3) 8%, var(--teal-soft) 22%, var(--teal) 50%, var(--teal-soft) 78%, var(--paper-3) 92%, var(--paper-3) 100%); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); margin: 32px 0 48px; }
+.status-pill { display: inline-flex; align-items: center; justify-content: center; min-width: 72px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 8px; border: 1px solid currentColor; }
+.status-ok { color: var(--teal-dim); background: var(--teal-soft); }
+.status-warning { color: var(--signal); background: var(--signal-soft); }
+.status-critical { color: #991B1B; background: #FEE2E2; }
+.check-table { width: 100%; border-collapse: collapse; border: 1px solid var(--ink); font-size: 13px; }
+.check-table th { background: var(--paper-2); font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--ink); }
+.check-table td { padding: 11px 12px; border-bottom: 1px solid var(--paper-3); vertical-align: top; }
+.check-table tr:last-child td { border-bottom: 0; }
+.check-muted { color: var(--ink-3); font-family: var(--mono); font-size: 11px; }
 </style>
 """
 )
@@ -430,6 +463,303 @@ def build_data_source_map() -> pd.DataFrame:
     )
 
 
+def build_product_pricing_checks(today: date | None = None) -> pd.DataFrame:
+    if today is None:
+        today = date.today()
+
+    products = [
+        {
+            "item_id": "PM-100",
+            "product": "Smart valve actuator",
+            "category": "Controls",
+            "cost": 118.00,
+            "expected_price": 169.00,
+            "expected_start": today - timedelta(days=4),
+            "expected_end": today + timedelta(days=24),
+            "channels": {
+                "Local": (169.00, -4, 24),
+                "Branch": (169.00, -4, 24),
+                "Online": (171.00, -4, 24),
+            },
+        },
+        {
+            "item_id": "PM-220",
+            "product": "Filter replacement kit",
+            "category": "Maintenance",
+            "cost": 42.50,
+            "expected_price": 64.00,
+            "expected_start": today - timedelta(days=2),
+            "expected_end": today + timedelta(days=12),
+            "channels": {
+                "Local": (59.00, -2, 12),
+                "Branch": (64.00, -2, 12),
+                "Online": (64.00, -1, 12),
+            },
+        },
+        {
+            "item_id": "PM-340",
+            "product": "Sensor calibration bundle",
+            "category": "Service parts",
+            "cost": 76.00,
+            "expected_price": 112.00,
+            "expected_start": today,
+            "expected_end": today + timedelta(days=14),
+            "channels": {
+                "Local": (112.00, 0, 14),
+                "Branch": (112.00, 0, -1),
+                "Online": (109.00, 0, 14),
+            },
+        },
+        {
+            "item_id": "PM-480",
+            "product": "Weekly promo thermostat",
+            "category": "Campaign",
+            "cost": 88.00,
+            "expected_price": 119.00,
+            "expected_start": today - timedelta(days=1),
+            "expected_end": today + timedelta(days=6),
+            "channels": {
+                "Local": (119.00, -1, 6),
+                "Branch": (125.00, -1, 6),
+                "Online": (119.00, -8, -2),
+            },
+        },
+    ]
+
+    rows = []
+    for product in products:
+        for channel, (system_price, start_offset, end_offset) in product[
+            "channels"
+        ].items():
+            rows.append(
+                {
+                    "item_id": product["item_id"],
+                    "product": product["product"],
+                    "category": product["category"],
+                    "channel": channel,
+                    "system_price": system_price,
+                    "expected_price": product["expected_price"],
+                    "system_start": today + timedelta(days=start_offset),
+                    "system_end": today + timedelta(days=end_offset),
+                    "expected_start": product["expected_start"],
+                    "expected_end": product["expected_end"],
+                    "cost": product["cost"],
+                }
+            )
+
+    return validate_product_pricing(pd.DataFrame(rows), today)
+
+
+def validate_product_pricing(df: pd.DataFrame, today: date | None = None) -> pd.DataFrame:
+    if today is None:
+        today = date.today()
+
+    checked = df.copy()
+    checked["price_gap_pct"] = (
+        (checked["system_price"] - checked["expected_price"])
+        / checked["expected_price"].replace(0, np.nan)
+        * 100
+    ).round(1)
+    checked["price_ok"] = checked["price_gap_pct"].abs() <= 5
+    checked["start_ok"] = checked["system_start"] == checked["expected_start"]
+    checked["end_ok"] = checked["system_end"] == checked["expected_end"]
+    checked["active_today"] = (
+        pd.to_datetime(today) >= pd.to_datetime(checked["system_start"])
+    ) & (pd.to_datetime(today) <= pd.to_datetime(checked["system_end"]))
+    checked["margin_pct"] = (
+        (checked["system_price"] - checked["cost"]) / checked["system_price"] * 100
+    ).round(1)
+    checked["margin_ok"] = checked["margin_pct"] >= 10
+    checked["status"] = "OK"
+    checked.loc[~checked["active_today"], "status"] = "Critical"
+    warning = checked["status"].ne("Critical") & ~checked[
+        ["price_ok", "start_ok", "end_ok", "margin_ok"]
+    ].all(axis=1)
+    checked.loc[warning, "status"] = "Warning"
+
+    checked["issue"] = ""
+    checked.loc[~checked["active_today"], "issue"] = "Not active today"
+    checked.loc[
+        checked["active_today"] & ~checked["price_ok"], "issue"
+    ] = "Price differs from expected"
+    checked.loc[
+        checked["active_today"] & checked["price_ok"] & ~(checked["start_ok"] & checked["end_ok"]),
+        "issue",
+    ] = "Validity window mismatch"
+    checked.loc[
+        checked["active_today"]
+        & checked["price_ok"]
+        & checked["start_ok"]
+        & checked["end_ok"]
+        & ~checked["margin_ok"],
+        "issue",
+    ] = "Margin below floor"
+    checked.loc[checked["issue"].eq(""), "issue"] = "Ready"
+    return checked
+
+
+def product_correction_payload(df: pd.DataFrame) -> dict:
+    needs_fix = df[df["status"].ne("OK")]
+    return {
+        "control": "product_pricing_setup",
+        "source": "synthetic product master",
+        "records_checked": int(len(df)),
+        "records_to_correct": int(len(needs_fix)),
+        "actions": [
+            {
+                "item_id": row.item_id,
+                "channel": row.channel,
+                "issue": row.issue,
+                "set_price": round(float(row.expected_price), 2),
+                "set_start": str(row.expected_start),
+                "set_end": str(row.expected_end),
+            }
+            for row in needs_fix.itertuples()
+        ],
+    }
+
+
+@st.cache_data
+def build_stock_forecast_data(
+    today: date | None = None,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    if today is None:
+        today = date.today()
+
+    items = pd.DataFrame(
+        [
+            {
+                "item_id": "PM-100",
+                "product": "Smart valve actuator",
+                "category": "Controls",
+                "current_stock": 420,
+                "reorder_point": 160,
+                "incoming_qty": 260,
+                "lead_time_days": 12,
+                "supplier": "Nordic Components",
+            },
+            {
+                "item_id": "PM-220",
+                "product": "Filter replacement kit",
+                "category": "Maintenance",
+                "current_stock": 280,
+                "reorder_point": 140,
+                "incoming_qty": 180,
+                "lead_time_days": 8,
+                "supplier": "Field Supply Oy",
+            },
+            {
+                "item_id": "PM-340",
+                "product": "Sensor calibration bundle",
+                "category": "Service parts",
+                "current_stock": 190,
+                "reorder_point": 90,
+                "incoming_qty": 120,
+                "lead_time_days": 16,
+                "supplier": "Precision Labs",
+            },
+            {
+                "item_id": "PM-480",
+                "product": "Weekly promo thermostat",
+                "category": "Campaign",
+                "current_stock": 140,
+                "reorder_point": 110,
+                "incoming_qty": 220,
+                "lead_time_days": 10,
+                "supplier": "Comfort Devices",
+            },
+        ]
+    )
+
+    days = pd.date_range(today - timedelta(days=180), today - timedelta(days=1), freq="D")
+    rows = []
+    base_demand = {"PM-100": 9.5, "PM-220": 13.0, "PM-340": 6.0, "PM-480": 8.0}
+    for item in items.itertuples():
+        seed = int(hashlib.sha256(item.item_id.encode("utf-8")).hexdigest()[:8], 16)
+        rng = np.random.default_rng(seed)
+        for ds in days:
+            weekday = 1.18 if ds.weekday() in (0, 1, 2) else 0.92
+            trend = 1 + ((ds.date() - (today - timedelta(days=180))).days / 180) * 0.12
+            campaign = 1.0
+            if item.item_id == "PM-480" and ds >= pd.Timestamp(today - timedelta(days=28)):
+                campaign = 1.45
+            noise = rng.normal(0, 1.6)
+            demand = max(0, base_demand[item.item_id] * weekday * trend * campaign + noise)
+            rows.append(
+                {
+                    "ds": ds,
+                    "y": round(float(demand), 2),
+                    "item_id": item.item_id,
+                    "product": item.product,
+                }
+            )
+
+    return items, pd.DataFrame(rows)
+
+
+@st.cache_data
+def forecast_stock_for_item(
+    item_id: str, current_stock: int, incoming_qty: int, lead_time_days: int, horizon: int = 45
+) -> tuple[pd.DataFrame, str]:
+    today = date.today()
+    _, demand_history = build_stock_forecast_data(today)
+    history = demand_history[demand_history["item_id"] == item_id][["ds", "y"]].copy()
+
+    if Prophet is not None:
+        model = Prophet(
+            weekly_seasonality=True,
+            daily_seasonality=False,
+            yearly_seasonality=False,
+            interval_width=0.8,
+        )
+        model.fit(history)
+        future = model.make_future_dataframe(periods=horizon)
+        forecast = model.predict(future).tail(horizon)
+        forecast_df = forecast[["ds", "yhat", "yhat_lower", "yhat_upper"]].copy()
+        model_label = "Prophet"
+    else:
+        recent = history.tail(42).copy()
+        baseline = float(recent["y"].rolling(14, min_periods=7).mean().iloc[-1])
+        future_dates = pd.date_range(today, periods=horizon, freq="D")
+        rows = []
+        for ds in future_dates:
+            weekday = 1.16 if ds.weekday() in (0, 1, 2) else 0.94
+            yhat = max(0, baseline * weekday)
+            rows.append(
+                {
+                    "ds": ds,
+                    "yhat": yhat,
+                    "yhat_lower": max(0, yhat * 0.78),
+                    "yhat_upper": yhat * 1.22,
+                }
+            )
+        forecast_df = pd.DataFrame(rows)
+        model_label = "Fallback moving average"
+
+    forecast_df["yhat"] = forecast_df["yhat"].clip(lower=0)
+    forecast_df["yhat_lower"] = forecast_df["yhat_lower"].clip(lower=0)
+    forecast_df["yhat_upper"] = forecast_df["yhat_upper"].clip(lower=0)
+
+    projected = []
+    stock = float(current_stock)
+    incoming_date = pd.Timestamp(today + timedelta(days=lead_time_days))
+    for row in forecast_df.itertuples():
+        stock -= float(row.yhat)
+        if pd.Timestamp(row.ds).normalize() == incoming_date.normalize():
+            stock += incoming_qty
+        projected.append(max(stock, 0))
+    forecast_df["projected_stock"] = projected
+    return forecast_df, model_label
+
+
+def stock_status_label(reorder_days: int | None, stockout_days: int | None) -> str:
+    if stockout_days is not None and stockout_days <= 14:
+        return "Critical"
+    if reorder_days is not None and reorder_days <= 21:
+        return "Warning"
+    return "OK"
+
+
 def automation_payload(
     job_type: str,
     region: str,
@@ -548,7 +878,7 @@ def generate_synthetic_data(n_rows: int = 900, seed: int = 42) -> pd.DataFrame:
     return pd.DataFrame(rows).sort_values("date").reset_index(drop=True)
 
 
-@st.cache_data
+@st.cache_resource
 def build_models(df: pd.DataFrame) -> PriceModels:
     X = df[
         [
@@ -626,7 +956,9 @@ def predict_band(models: PriceModels, row: pd.DataFrame):
 def generate_competitor_prices(
     job_type: str, region: str, our_price: float
 ) -> pd.DataFrame:
-    rng = np.random.default_rng(abs(hash(job_type + region)) % (2**32))
+    seed_text = f"{job_type}:{region}".encode("utf-8")
+    seed = int(hashlib.sha256(seed_text).hexdigest()[:8], 16)
+    rng = np.random.default_rng(seed)
     base = our_price * rng.uniform(0.78, 1.22)
     competitors = [
         {"Competitor": "Alpha Services", "price": base * rng.uniform(0.88, 1.05)},
@@ -710,31 +1042,90 @@ def main():
     df = generate_synthetic_data(n_rows=row_count)
     models = build_models(df)
 
+    scenario_presets = {
+        "Market-aligned": {
+            "job_type": "HVAC",
+            "region": "West",
+            "season": "Summer",
+            "complexity": 6.5,
+            "materials": 3400,
+            "labour": 52,
+            "target_margin": 0.18,
+            "market_weight": 10,
+        },
+        "Conservative": {
+            "job_type": "Plumbing",
+            "region": "Midwest",
+            "season": "Spring",
+            "complexity": 4.8,
+            "materials": 2200,
+            "labour": 36,
+            "target_margin": 0.15,
+            "market_weight": 20,
+        },
+        "Growth": {
+            "job_type": "Electrical",
+            "region": "Southeast",
+            "season": "Fall",
+            "complexity": 5.8,
+            "materials": 2800,
+            "labour": 44,
+            "target_margin": 0.12,
+            "market_weight": 30,
+        },
+        "Urgent service": {
+            "job_type": "Renovation",
+            "region": "Northeast",
+            "season": "Winter",
+            "complexity": 8.2,
+            "materials": 7600,
+            "labour": 96,
+            "target_margin": 0.24,
+            "market_weight": 5,
+        },
+    }
+    preset_name = st.sidebar.selectbox(
+        "Scenario preset", list(scenario_presets.keys()), index=0
+    )
+    preset = scenario_presets[preset_name]
+
+    job_types = ["Electrical", "HVAC", "Plumbing", "Renovation", "Landscaping"]
+    regions = ["Northeast", "Southeast", "Midwest", "Southwest", "West"]
+    seasons = ["Winter", "Spring", "Summer", "Fall"]
+
     job_type = st.sidebar.selectbox(
         "Job Type",
-        ["Electrical", "HVAC", "Plumbing", "Renovation", "Landscaping"],
-        index=1,
+        job_types,
+        index=job_types.index(preset["job_type"]),
     )
     region = st.sidebar.selectbox(
-        "Region", ["Northeast", "Southeast", "Midwest", "Southwest", "West"], index=4
+        "Region", regions, index=regions.index(preset["region"])
     )
     season = st.sidebar.selectbox(
-        "Season", ["Winter", "Spring", "Summer", "Fall"], index=2
+        "Season", seasons, index=seasons.index(preset["season"])
     )
     complexity = st.sidebar.slider(
-        "Complexity", min_value=1.0, max_value=10.0, value=6.5, step=0.1
+        "Complexity",
+        min_value=1.0,
+        max_value=10.0,
+        value=preset["complexity"],
+        step=0.1,
     )
     materials = st.sidebar.slider(
-        "Materials estimate ($)", min_value=200, max_value=20000, value=3400, step=100
+        "Materials estimate ($)",
+        min_value=200,
+        max_value=20000,
+        value=preset["materials"],
+        step=100,
     )
     labour = st.sidebar.slider(
-        "Labour hours", min_value=4, max_value=300, value=52, step=1
+        "Labour hours", min_value=4, max_value=300, value=preset["labour"], step=1
     )
     target_margin = st.sidebar.slider(
         "Target margin",
         min_value=0.05,
         max_value=0.35,
-        value=0.18,
+        value=preset["target_margin"],
         step=0.01,
         format="%.0f%%",
     )
@@ -744,7 +1135,7 @@ def main():
         "Competitor price weight",
         min_value=0,
         max_value=30,
-        value=10,
+        value=preset["market_weight"],
         step=5,
         format="%d%%",
         help="How much competitor market data pulls the recommendation (0 = ignore, 30 = strong pull)",
@@ -816,8 +1207,8 @@ def main():
     )
 
     # ── Tabs ──────────────────────────────────────────────────────────────────
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(
-        ["Quote", "Data", "History", "Why", "Handoff"]
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(
+        ["Quote", "Data", "History", "Why", "Product Check", "Stock Forecast", "Handoff"]
     )
 
     # =========================================================================
@@ -841,6 +1232,9 @@ def main():
             f"Two views of the same job — a historical-data band trained on synthetic prior service quotes, "
             f"plus a transparent rule-based catalog calculation. The recommendation is a weighted blend — "
             f"with a manual review flag when the two views disagree by more than 18%.</p>"
+            f'<span style="display:inline-block;margin-top:12px;font-family:var(--mono);font-size:10px;'
+            f'letter-spacing:0.08em;text-transform:uppercase;color:#0F766E;background:#CCFBF1;'
+            f'border:1px solid #0F766E;padding:4px 10px;">Synthetic data · not real prices</span>'
             f"</div>"
             f'<div style="text-align:right;flex-shrink:0;">'
             f'<span style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;'
@@ -856,6 +1250,26 @@ def main():
             f'Confidence&nbsp;<strong style="color:#0A1F24;">{confidence}</strong>'
             f'&nbsp;&nbsp;Review&nbsp;<strong style="color:#0A1F24;">{review_label}</strong>'
             f"</div></div></div>",
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            f'<div style="display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));'
+            f'border:1px solid #0A1F24;border-top:0;margin-bottom:28px;">'
+            f'<div style="padding:14px 16px;border-right:1px solid #DDD6C5;">'
+            f'<span style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#1B3F47;">Model mid</span>'
+            f'<div style="font-family:var(--serif);font-size:28px;letter-spacing:-0.02em;">{_fmt(mid)}</div></div>'
+            f'<div style="padding:14px 16px;border-right:1px solid #DDD6C5;">'
+            f'<span style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#1B3F47;">Catalog total</span>'
+            f'<div style="font-family:var(--serif);font-size:28px;letter-spacing:-0.02em;">{_fmt(catalog_price.total)}</div></div>'
+            f'<div style="padding:14px 16px;border-right:1px solid #DDD6C5;">'
+            f'<span style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#1B3F47;">Market median</span>'
+            f'<div style="font-family:var(--serif);font-size:28px;letter-spacing:-0.02em;">{_fmt(market_median)}</div></div>'
+            f'<div style="padding:14px 16px;">'
+            f'<span style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#1B3F47;">Decision rule</span>'
+            f'<div style="font-family:var(--serif);font-size:28px;letter-spacing:-0.02em;">{"Review" if review_required else "Proceed"}</div>'
+            f'<span style="font-family:var(--mono);font-size:10px;color:#1B3F47;">18% model-gap threshold</span></div>'
+            f'</div>',
             unsafe_allow_html=True,
         )
 
@@ -996,7 +1410,7 @@ def main():
             ),
             bargap=0.4,
         )
-        st.plotly_chart(fig_comp, use_container_width=True)
+        st.plotly_chart(fig_comp, width="stretch")
 
         st.markdown(
             "<hr style='border:0;border-top:1px solid #0A1F24;margin:8px 0 32px;'>",
@@ -1156,7 +1570,7 @@ def main():
                 ),
                 bargap=0.35,
             )
-            st.plotly_chart(fig_wf, use_container_width=True)
+            st.plotly_chart(fig_wf, width="stretch")
 
         # Dark summary cards
         st.markdown(
@@ -1180,9 +1594,9 @@ def main():
             f'<div class="card-item card-item-dark"><span class="eyebrow eyebrow-teal" style="color:#0F766E;">Catalog total</span>'
             f'<p class="card-num card-num-dark">{_fmt(catalog_price.total)}</p>'
             f'<span class="card-sub card-sub-dark">Rule-based · transparent</span></div>'
-            f'<div class="card-item card-item-dark"><span class="eyebrow eyebrow-teal" style="color:#0F766E;">Blend (65/35)</span>'
+            f'<div class="card-item card-item-dark"><span class="eyebrow eyebrow-teal" style="color:#0F766E;">Final recommendation</span>'
             f'<p class="card-num card-num-dark">{_fmt(recommended_price)} <small style="font-size:0.5em;font-style:italic;color:#0F766E;">↗</small></p>'
-            f'<span class="card-sub card-sub-dark">Recommended quote</span></div>'
+            f'<span class="card-sub card-sub-dark">65/35 blend + {market_weight}% market pull</span></div>'
             f"</div></div>",
             unsafe_allow_html=True,
         )
@@ -1199,7 +1613,7 @@ def main():
             "Where the score is weak, manual review takes the wheel.</p>",
             unsafe_allow_html=True,
         )
-        st.dataframe(build_data_source_map(), use_container_width=True, hide_index=True)
+        st.dataframe(build_data_source_map(), width="stretch", hide_index=True)
 
         st.markdown(
             "<hr style='border:0;border-top:1px solid #0A1F24;margin:32px 0 0;'>",
@@ -1262,7 +1676,7 @@ def main():
                 height=340,
                 showlegend=False,
             )
-            st.plotly_chart(fig_radar, use_container_width=True)
+            st.plotly_chart(fig_radar, width="stretch")
 
         with quote_col:
             st.markdown(
@@ -1315,7 +1729,7 @@ def main():
             ),
             title_text="",
         )
-        st.plotly_chart(fig_dist, use_container_width=True)
+        st.plotly_chart(fig_dist, width="stretch")
 
         st.markdown(
             "<hr style='border:0;border-top:1px solid #DDD6C5;margin:16px 0 24px;'>",
@@ -1338,7 +1752,7 @@ def main():
         out_df["final_price"] = out_df["final_price"].map(lambda x: f"${x:,.0f}")
         out_df["group_mean"] = out_df["group_mean"].map(lambda x: f"${x:,.0f}")
         out_df["z_score"] = out_df["z_score"].map(lambda x: f"{x:+.2f}")
-        st.dataframe(out_df, use_container_width=True, hide_index=True)
+        st.dataframe(out_df, width="stretch", hide_index=True)
 
         st.markdown(
             "<hr style='border:0;border-top:1px solid #0A1F24;margin:32px 0 0;'>",
@@ -1370,7 +1784,7 @@ def main():
             showlegend=False,
             height=320,
         )
-        st.plotly_chart(fig_trend, use_container_width=True)
+        st.plotly_chart(fig_trend, width="stretch")
 
     # =========================================================================
     # TAB 4 · WHY
@@ -1433,9 +1847,444 @@ def main():
         comp_c3.metric("Blended recommendation", _fmt(recommended_price))
 
     # =========================================================================
-    # TAB 5 · HANDOFF
+    # TAB 5 · PRODUCT CHECK
     # =========================================================================
     with tab5:
+        product_checks = build_product_pricing_checks()
+        status_counts = product_checks["status"].value_counts()
+        ok_count = int(status_counts.get("OK", 0))
+        warning_count = int(status_counts.get("Warning", 0))
+        critical_count = int(status_counts.get("Critical", 0))
+        records_checked = len(product_checks)
+        pass_rate = ok_count / max(records_checked, 1) * 100
+
+        st.markdown(
+            '<span class="eyebrow">Product pricing control · master data setup</span>'
+            "<h2>Before prices go live, <em>prove</em> they are right.</h2>"
+            '<p style="font-size:13px;color:#1B3F47;max-width:560px;line-height:1.5;margin-bottom:24px;">'
+            "This adapts the product-dashboard idea into the same automation story: compare expected "
+            "product prices and validity windows against each sales channel, then route mismatches into "
+            "a correction payload before publishing or importing.</p>",
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            f'<div class="card-grid">'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">Records checked</span>'
+            f'<p class="card-num">{records_checked}</p><span class="card-sub">Product-channel rows</span></div>'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">OK</span>'
+            f'<p class="card-num">{ok_count}</p><span class="card-sub">Ready to publish</span></div>'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">Warnings</span>'
+            f'<p class="card-num">{warning_count}</p><span class="card-sub">Price/date mismatch</span></div>'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">Critical</span>'
+            f'<p class="card-num">{critical_count}</p><span class="card-sub">Inactive today</span></div>'
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+
+        left_check, right_check = st.columns([1.25, 1])
+        with left_check:
+            st.markdown(
+                '<span class="eyebrow">Exception queue</span>',
+                unsafe_allow_html=True,
+            )
+            visible = product_checks.copy()
+            visible["Price"] = visible["system_price"].map(lambda x: f"${x:,.2f}")
+            visible["Expected"] = visible["expected_price"].map(lambda x: f"${x:,.2f}")
+            visible["Gap"] = visible["price_gap_pct"].map(lambda x: f"{x:+.1f}%")
+            visible["Margin"] = visible["margin_pct"].map(lambda x: f"{x:.1f}%")
+            visible["Window"] = visible.apply(
+                lambda row: f"{row['system_start']} → {row['system_end']}", axis=1
+            )
+            visible["Expected window"] = visible.apply(
+                lambda row: f"{row['expected_start']} → {row['expected_end']}",
+                axis=1,
+            )
+            visible["severity"] = visible["status"].map(
+                {"Critical": 0, "Warning": 1, "OK": 2}
+            )
+            table_rows = ""
+            for _, row in visible.sort_values(["severity", "item_id"]).iterrows():
+                status_class = {
+                    "OK": "status-ok",
+                    "Warning": "status-warning",
+                    "Critical": "status-critical",
+                }[row["status"]]
+                table_rows += (
+                    "<tr>"
+                    f"<td><strong>{row['item_id']}</strong><br><span class='check-muted'>{row['product']}</span></td>"
+                    f"<td>{row['channel']}</td>"
+                    f"<td>{row['Price']}<br><span class='check-muted'>exp {row['Expected']} · {row['Gap']}</span></td>"
+                    f"<td>{row['Window']}<br><span class='check-muted'>exp {row['Expected window']}</span></td>"
+                    f"<td>{row['Margin']}</td>"
+                    f"<td><span class='status-pill {status_class}'>{row['status']}</span><br><span class='check-muted'>{row['issue']}</span></td>"
+                    "</tr>"
+                )
+            st.markdown(
+                "<table class='check-table'><thead><tr>"
+                "<th>Product</th><th>Channel</th><th>Price</th><th>Validity</th><th>Margin</th><th>Status</th>"
+                f"</tr></thead><tbody>{table_rows}</tbody></table>",
+                unsafe_allow_html=True,
+            )
+
+        with right_check:
+            st.markdown(
+                '<span class="eyebrow">Channel health</span>',
+                unsafe_allow_html=True,
+            )
+            channel_status = (
+                product_checks.groupby(["channel", "status"])
+                .size()
+                .reset_index(name="Records")
+            )
+            fig_product = px.bar(
+                channel_status,
+                x="channel",
+                y="Records",
+                color="status",
+                color_discrete_map={
+                    "OK": "#14B8A6",
+                    "Warning": "#F97316",
+                    "Critical": "#991B1B",
+                },
+                category_orders={"status": ["OK", "Warning", "Critical"]},
+            )
+            _apply_theme(fig_product)
+            fig_product.update_layout(
+                title_text="",
+                height=300,
+                legend=dict(
+                    font=dict(family="Geist Mono, monospace", size=10),
+                    title_text="",
+                ),
+                xaxis_title="",
+                yaxis_title="Records",
+            )
+            st.plotly_chart(fig_product, width="stretch")
+
+            st.markdown(
+                '<div style="background:#EAE5DA;border:1px solid #0A1F24;padding:20px;margin-top:18px;">'
+                '<span class="eyebrow" style="color:#0F766E;">Control rule</span>'
+                f"<p style=\"font-family:'Instrument Serif',serif;font-size:34px;line-height:0.95;letter-spacing:-0.02em;margin:8px 0;\">"
+                f"{pass_rate:.0f}% pass rate</p>"
+                '<p style="font-size:13px;color:#1B3F47;line-height:1.5;margin:0;">'
+                "Critical rows block publishing. Warning rows can be routed to a product manager "
+                "for price/date correction before the campaign or catalog import continues.</p></div>",
+                unsafe_allow_html=True,
+            )
+
+        st.markdown(
+            "<hr style='border:0;border-top:1px solid #0A1F24;margin:32px 0 24px;'>",
+            unsafe_allow_html=True,
+        )
+        payload_col, process_col = st.columns([1, 1])
+        with payload_col:
+            st.markdown(
+                '<span class="eyebrow" style="color:#0F766E;">Correction payload</span>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f'<pre class="code-block">{json.dumps(product_correction_payload(product_checks), indent=2)}</pre>',
+                unsafe_allow_html=True,
+            )
+
+        with process_col:
+            st.markdown(
+                '<span class="eyebrow" style="color:#0F766E;">Where this fits</span>',
+                unsafe_allow_html=True,
+            )
+            product_process = pd.DataFrame(
+                [
+                    {
+                        "Step": "01",
+                        "Control": "Load expected setup",
+                        "Result": "Approved price and validity window",
+                    },
+                    {
+                        "Step": "02",
+                        "Control": "Compare channels",
+                        "Result": "Local, Branch, Online checked",
+                    },
+                    {
+                        "Step": "03",
+                        "Control": "Block or correct",
+                        "Result": "Critical and warning rows routed",
+                    },
+                    {
+                        "Step": "04",
+                        "Control": "Publish",
+                        "Result": "Clean records continue to import",
+                    },
+                ]
+            )
+            st.dataframe(product_process, width="stretch", hide_index=True)
+
+    # =========================================================================
+    # TAB 6 · STOCK FORECAST
+    # =========================================================================
+    with tab6:
+        stock_items, demand_history = build_stock_forecast_data()
+        item_labels = {
+            f"{row.product} ({row.item_id})": row.item_id for row in stock_items.itertuples()
+        }
+
+        st.markdown(
+            '<span class="eyebrow">Product stock forecast · demand planning</span>'
+            "<h2>Pricing only works if stock can <em>keep up</em>.</h2>"
+            '<p style="font-size:13px;color:#1B3F47;max-width:580px;line-height:1.5;margin-bottom:24px;">'
+            "This extends the product-management view from setup correctness into stock readiness. "
+            "Historical daily demand is forecast with Prophet, then translated into projected stock "
+            "against reorder point, lead time, and incoming replenishment.</p>",
+            unsafe_allow_html=True,
+        )
+
+        selected_label = st.selectbox("Forecast product", list(item_labels.keys()))
+        selected_id = item_labels[selected_label]
+        selected_item = stock_items[stock_items["item_id"] == selected_id].iloc[0]
+        stock_forecast, forecast_model = forecast_stock_for_item(
+            selected_id,
+            int(selected_item["current_stock"]),
+            int(selected_item["incoming_qty"]),
+            int(selected_item["lead_time_days"]),
+        )
+
+        below_reorder = stock_forecast[
+            stock_forecast["projected_stock"] <= selected_item["reorder_point"]
+        ]
+        stockout = stock_forecast[stock_forecast["projected_stock"] <= 0]
+        reorder_days = (
+            int((below_reorder["ds"].iloc[0].date() - date.today()).days)
+            if not below_reorder.empty
+            else None
+        )
+        stockout_days = (
+            int((stockout["ds"].iloc[0].date() - date.today()).days)
+            if not stockout.empty
+            else None
+        )
+        stock_status = stock_status_label(reorder_days, stockout_days)
+        status_class = {
+            "OK": "status-ok",
+            "Warning": "status-warning",
+            "Critical": "status-critical",
+        }[stock_status]
+        avg_demand = demand_history[demand_history["item_id"] == selected_id]["y"].tail(28).mean()
+
+        st.markdown(
+            f'<div class="card-grid">'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">Current stock</span>'
+            f'<p class="card-num">{int(selected_item["current_stock"])}</p><span class="card-sub">Units on hand</span></div>'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">Reorder point</span>'
+            f'<p class="card-num">{int(selected_item["reorder_point"])}</p><span class="card-sub">Control threshold</span></div>'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">Avg demand</span>'
+            f'<p class="card-num">{avg_demand:.1f}</p><span class="card-sub">Units/day · last 28 days</span></div>'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">Stock status</span>'
+            f'<p class="card-num" style="font-size:34px;"><span class="status-pill {status_class}">{stock_status}</span></p>'
+            f'<span class="card-sub">{forecast_model} · 45-day horizon</span></div>'
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+
+        if Prophet is None:
+            st.warning(
+                "Prophet is not installed in the current environment, so this preview is using a moving-average fallback. "
+                "The deployed app will use Prophet when `prophet` is installed from requirements."
+            )
+
+        chart_left, chart_right = st.columns([1, 1])
+        with chart_left:
+            hist = demand_history[demand_history["item_id"] == selected_id].tail(90)
+            fig_demand = go.Figure()
+            fig_demand.add_trace(
+                go.Scatter(
+                    x=hist["ds"],
+                    y=hist["y"],
+                    mode="lines",
+                    line=dict(color="#1B3F47", width=1.5),
+                    name="Actual demand",
+                )
+            )
+            fig_demand.add_trace(
+                go.Scatter(
+                    x=stock_forecast["ds"],
+                    y=stock_forecast["yhat_upper"],
+                    mode="lines",
+                    line=dict(width=0),
+                    showlegend=False,
+                    hoverinfo="skip",
+                )
+            )
+            fig_demand.add_trace(
+                go.Scatter(
+                    x=stock_forecast["ds"],
+                    y=stock_forecast["yhat_lower"],
+                    mode="lines",
+                    fill="tonexty",
+                    fillcolor="rgba(20,184,166,0.18)",
+                    line=dict(width=0),
+                    name="Forecast interval",
+                )
+            )
+            fig_demand.add_trace(
+                go.Scatter(
+                    x=stock_forecast["ds"],
+                    y=stock_forecast["yhat"],
+                    mode="lines",
+                    line=dict(color="#14B8A6", width=2.4),
+                    name="Forecast demand",
+                )
+            )
+            _apply_theme(fig_demand)
+            fig_demand.update_layout(
+                title_text="Daily demand forecast",
+                height=340,
+                legend=dict(font=dict(family="Geist Mono, monospace", size=10)),
+                xaxis_title="",
+                yaxis_title="Units/day",
+            )
+            st.plotly_chart(fig_demand, width="stretch")
+
+        with chart_right:
+            fig_stock = go.Figure()
+            fig_stock.add_trace(
+                go.Scatter(
+                    x=stock_forecast["ds"],
+                    y=stock_forecast["projected_stock"],
+                    mode="lines",
+                    fill="tozeroy",
+                    fillcolor="rgba(45,212,191,0.16)",
+                    line=dict(color="#0A1F24", width=2.2),
+                    name="Projected stock",
+                )
+            )
+            fig_stock.add_hline(
+                y=selected_item["reorder_point"],
+                line_color="#F97316",
+                line_dash="dash",
+                annotation_text=f"Reorder point {int(selected_item['reorder_point'])}",
+                annotation_font=dict(
+                    family="Geist Mono, monospace", size=10, color="#F97316"
+                ),
+            )
+            incoming_date = pd.Timestamp(
+                date.today() + timedelta(days=int(selected_item["lead_time_days"]))
+            )
+            fig_stock.add_shape(
+                type="line",
+                x0=incoming_date,
+                x1=incoming_date,
+                y0=0,
+                y1=1,
+                xref="x",
+                yref="paper",
+                line=dict(color="#14B8A6", width=1.5, dash="dot"),
+            )
+            fig_stock.add_annotation(
+                x=incoming_date,
+                y=1,
+                xref="x",
+                yref="paper",
+                text=f"Incoming +{int(selected_item['incoming_qty'])}",
+                showarrow=False,
+                yshift=12,
+                font=dict(family="Geist Mono, monospace", size=10, color="#14B8A6"),
+            )
+            _apply_theme(fig_stock)
+            fig_stock.update_layout(
+                title_text="Projected stock position",
+                height=340,
+                showlegend=False,
+                xaxis_title="",
+                yaxis_title="Units",
+            )
+            st.plotly_chart(fig_stock, width="stretch")
+
+        st.markdown(
+            "<hr style='border:0;border-top:1px solid #0A1F24;margin:24px 0;'>",
+            unsafe_allow_html=True,
+        )
+
+        queue_rows = []
+        for item in stock_items.itertuples():
+            item_forecast, item_model = forecast_stock_for_item(
+                item.item_id,
+                int(item.current_stock),
+                int(item.incoming_qty),
+                int(item.lead_time_days),
+            )
+            item_reorder = item_forecast[item_forecast["projected_stock"] <= item.reorder_point]
+            item_stockout = item_forecast[item_forecast["projected_stock"] <= 0]
+            item_reorder_days = (
+                int((item_reorder["ds"].iloc[0].date() - date.today()).days)
+                if not item_reorder.empty
+                else None
+            )
+            item_stockout_days = (
+                int((item_stockout["ds"].iloc[0].date() - date.today()).days)
+                if not item_stockout.empty
+                else None
+            )
+            item_status = stock_status_label(item_reorder_days, item_stockout_days)
+            queue_rows.append(
+                {
+                    "Item": item.item_id,
+                    "Product": item.product,
+                    "Supplier": item.supplier,
+                    "Current stock": item.current_stock,
+                    "Reorder point": item.reorder_point,
+                    "Reorder in": (
+                        f"{item_reorder_days} days" if item_reorder_days is not None else ">45 days"
+                    ),
+                    "Incoming": f"{item.incoming_qty} units in {item.lead_time_days} days",
+                    "Status": item_status,
+                }
+            )
+
+        queue_df = pd.DataFrame(queue_rows)
+        severity_order = {"Critical": 0, "Warning": 1, "OK": 2}
+        queue_df["Sort"] = queue_df["Status"].map(severity_order)
+        queue_df = queue_df.sort_values(["Sort", "Item"]).drop(columns=["Sort"])
+
+        queue_col, payload_col = st.columns([1.25, 1])
+        with queue_col:
+            st.markdown(
+                '<span class="eyebrow">Replenishment queue</span>',
+                unsafe_allow_html=True,
+            )
+            st.dataframe(queue_df, width="stretch", hide_index=True)
+
+        with payload_col:
+            stock_payload = {
+                "control": "stock_forecast",
+                "model": forecast_model,
+                "horizon_days": 45,
+                "selected_item": selected_id,
+                "status": stock_status,
+                "reorder_in_days": reorder_days,
+                "stockout_in_days": stockout_days,
+                "recommended_action": (
+                    "Expedite replenishment or cap promotion demand"
+                    if stock_status == "Critical"
+                    else (
+                        "Prepare purchase order before reorder threshold"
+                        if stock_status == "Warning"
+                        else "No replenishment action needed in forecast window"
+                    )
+                ),
+            }
+            st.markdown(
+                '<span class="eyebrow" style="color:#0F766E;">Planning payload</span>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f'<pre class="code-block">{json.dumps(stock_payload, indent=2)}</pre>',
+                unsafe_allow_html=True,
+            )
+
+    # =========================================================================
+    # TAB 7 · HANDOFF
+    # =========================================================================
+    with tab7:
         st.markdown(
             '<span class="eyebrow">Automation handoff · JSON payload</span>'
             "<h2>From a <em>recommendation</em> to a workflow step.</h2>"
@@ -1580,7 +2429,7 @@ def main():
                 },
             ]
         )
-        st.dataframe(process, use_container_width=True, hide_index=True)
+        st.dataframe(process, width="stretch", hide_index=True)
 
     # ── Footer ────────────────────────────────────────────────────────────────
     st.markdown(
@@ -1593,7 +2442,7 @@ def main():
     )
 
     with st.expander("Preview synthetic data"):
-        st.dataframe(df.head(20), use_container_width=True)
+        st.dataframe(df.head(20), width="stretch")
 
 
 if __name__ == "__main__":
