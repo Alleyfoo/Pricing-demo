@@ -1,4 +1,5 @@
 import json
+import hashlib
 import math
 import time as _time
 from dataclasses import dataclass
@@ -12,7 +13,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.preprocessing import OneHotEncoder
 
-st.set_page_config(page_title="Pricing Demo", layout="wide")
+st.set_page_config(page_title="Service Pricing Automation Demo", layout="wide")
 
 # ── Design system CSS ─────────────────────────────────────────────────────────
 st.html(
@@ -72,12 +73,14 @@ header[data-testid="stHeader"] { background: var(--paper) !important; border-bot
   font-size: 13px !important;
   color: var(--paper) !important;
 }
-[data-testid="stSidebar"] .stSlider [data-testid="stThumbValue"],
 [data-testid="stSidebar"] .stSlider [data-testid="stTickBarMin"],
 [data-testid="stSidebar"] .stSlider [data-testid="stTickBarMax"] {
   font-family: var(--mono) !important;
   font-size: 12px !important;
   color: var(--teal-bright) !important;
+}
+[data-testid="stSidebar"] .stSlider [data-testid="stThumbValue"] {
+  display: none !important;
 }
 [data-testid="stSidebar"] .stSlider > div > div > div {
   background: var(--teal-bright) !important;
@@ -548,7 +551,7 @@ def generate_synthetic_data(n_rows: int = 900, seed: int = 42) -> pd.DataFrame:
     return pd.DataFrame(rows).sort_values("date").reset_index(drop=True)
 
 
-@st.cache_data
+@st.cache_resource
 def build_models(df: pd.DataFrame) -> PriceModels:
     X = df[
         [
@@ -626,7 +629,9 @@ def predict_band(models: PriceModels, row: pd.DataFrame):
 def generate_competitor_prices(
     job_type: str, region: str, our_price: float
 ) -> pd.DataFrame:
-    rng = np.random.default_rng(abs(hash(job_type + region)) % (2**32))
+    seed_text = f"{job_type}:{region}".encode("utf-8")
+    seed = int(hashlib.sha256(seed_text).hexdigest()[:8], 16)
+    rng = np.random.default_rng(seed)
     base = our_price * rng.uniform(0.78, 1.22)
     competitors = [
         {"Competitor": "Alpha Services", "price": base * rng.uniform(0.88, 1.05)},
@@ -710,31 +715,90 @@ def main():
     df = generate_synthetic_data(n_rows=row_count)
     models = build_models(df)
 
+    scenario_presets = {
+        "Market-aligned": {
+            "job_type": "HVAC",
+            "region": "West",
+            "season": "Summer",
+            "complexity": 6.5,
+            "materials": 3400,
+            "labour": 52,
+            "target_margin": 0.18,
+            "market_weight": 10,
+        },
+        "Conservative": {
+            "job_type": "Plumbing",
+            "region": "Midwest",
+            "season": "Spring",
+            "complexity": 4.8,
+            "materials": 2200,
+            "labour": 36,
+            "target_margin": 0.15,
+            "market_weight": 20,
+        },
+        "Growth": {
+            "job_type": "Electrical",
+            "region": "Southeast",
+            "season": "Fall",
+            "complexity": 5.8,
+            "materials": 2800,
+            "labour": 44,
+            "target_margin": 0.12,
+            "market_weight": 30,
+        },
+        "Urgent service": {
+            "job_type": "Renovation",
+            "region": "Northeast",
+            "season": "Winter",
+            "complexity": 8.2,
+            "materials": 7600,
+            "labour": 96,
+            "target_margin": 0.24,
+            "market_weight": 5,
+        },
+    }
+    preset_name = st.sidebar.selectbox(
+        "Scenario preset", list(scenario_presets.keys()), index=0
+    )
+    preset = scenario_presets[preset_name]
+
+    job_types = ["Electrical", "HVAC", "Plumbing", "Renovation", "Landscaping"]
+    regions = ["Northeast", "Southeast", "Midwest", "Southwest", "West"]
+    seasons = ["Winter", "Spring", "Summer", "Fall"]
+
     job_type = st.sidebar.selectbox(
         "Job Type",
-        ["Electrical", "HVAC", "Plumbing", "Renovation", "Landscaping"],
-        index=1,
+        job_types,
+        index=job_types.index(preset["job_type"]),
     )
     region = st.sidebar.selectbox(
-        "Region", ["Northeast", "Southeast", "Midwest", "Southwest", "West"], index=4
+        "Region", regions, index=regions.index(preset["region"])
     )
     season = st.sidebar.selectbox(
-        "Season", ["Winter", "Spring", "Summer", "Fall"], index=2
+        "Season", seasons, index=seasons.index(preset["season"])
     )
     complexity = st.sidebar.slider(
-        "Complexity", min_value=1.0, max_value=10.0, value=6.5, step=0.1
+        "Complexity",
+        min_value=1.0,
+        max_value=10.0,
+        value=preset["complexity"],
+        step=0.1,
     )
     materials = st.sidebar.slider(
-        "Materials estimate ($)", min_value=200, max_value=20000, value=3400, step=100
+        "Materials estimate ($)",
+        min_value=200,
+        max_value=20000,
+        value=preset["materials"],
+        step=100,
     )
     labour = st.sidebar.slider(
-        "Labour hours", min_value=4, max_value=300, value=52, step=1
+        "Labour hours", min_value=4, max_value=300, value=preset["labour"], step=1
     )
     target_margin = st.sidebar.slider(
         "Target margin",
         min_value=0.05,
         max_value=0.35,
-        value=0.18,
+        value=preset["target_margin"],
         step=0.01,
         format="%.0f%%",
     )
@@ -744,7 +808,7 @@ def main():
         "Competitor price weight",
         min_value=0,
         max_value=30,
-        value=10,
+        value=preset["market_weight"],
         step=5,
         format="%d%%",
         help="How much competitor market data pulls the recommendation (0 = ignore, 30 = strong pull)",
@@ -841,6 +905,9 @@ def main():
             f"Two views of the same job — a historical-data band trained on synthetic prior service quotes, "
             f"plus a transparent rule-based catalog calculation. The recommendation is a weighted blend — "
             f"with a manual review flag when the two views disagree by more than 18%.</p>"
+            f'<span style="display:inline-block;margin-top:12px;font-family:var(--mono);font-size:10px;'
+            f'letter-spacing:0.08em;text-transform:uppercase;color:#0F766E;background:#CCFBF1;'
+            f'border:1px solid #0F766E;padding:4px 10px;">Synthetic data · not real prices</span>'
             f"</div>"
             f'<div style="text-align:right;flex-shrink:0;">'
             f'<span style="font-family:var(--mono);font-size:10px;letter-spacing:0.12em;text-transform:uppercase;'
@@ -856,6 +923,26 @@ def main():
             f'Confidence&nbsp;<strong style="color:#0A1F24;">{confidence}</strong>'
             f'&nbsp;&nbsp;Review&nbsp;<strong style="color:#0A1F24;">{review_label}</strong>'
             f"</div></div></div>",
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            f'<div style="display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));'
+            f'border:1px solid #0A1F24;border-top:0;margin-bottom:28px;">'
+            f'<div style="padding:14px 16px;border-right:1px solid #DDD6C5;">'
+            f'<span style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#1B3F47;">Model mid</span>'
+            f'<div style="font-family:var(--serif);font-size:28px;letter-spacing:-0.02em;">{_fmt(mid)}</div></div>'
+            f'<div style="padding:14px 16px;border-right:1px solid #DDD6C5;">'
+            f'<span style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#1B3F47;">Catalog total</span>'
+            f'<div style="font-family:var(--serif);font-size:28px;letter-spacing:-0.02em;">{_fmt(catalog_price.total)}</div></div>'
+            f'<div style="padding:14px 16px;border-right:1px solid #DDD6C5;">'
+            f'<span style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#1B3F47;">Market median</span>'
+            f'<div style="font-family:var(--serif);font-size:28px;letter-spacing:-0.02em;">{_fmt(market_median)}</div></div>'
+            f'<div style="padding:14px 16px;">'
+            f'<span style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:#1B3F47;">Decision rule</span>'
+            f'<div style="font-family:var(--serif);font-size:28px;letter-spacing:-0.02em;">{"Review" if review_required else "Proceed"}</div>'
+            f'<span style="font-family:var(--mono);font-size:10px;color:#1B3F47;">18% model-gap threshold</span></div>'
+            f'</div>',
             unsafe_allow_html=True,
         )
 
@@ -996,7 +1083,7 @@ def main():
             ),
             bargap=0.4,
         )
-        st.plotly_chart(fig_comp, use_container_width=True)
+        st.plotly_chart(fig_comp, width="stretch")
 
         st.markdown(
             "<hr style='border:0;border-top:1px solid #0A1F24;margin:8px 0 32px;'>",
@@ -1156,7 +1243,7 @@ def main():
                 ),
                 bargap=0.35,
             )
-            st.plotly_chart(fig_wf, use_container_width=True)
+            st.plotly_chart(fig_wf, width="stretch")
 
         # Dark summary cards
         st.markdown(
@@ -1180,9 +1267,9 @@ def main():
             f'<div class="card-item card-item-dark"><span class="eyebrow eyebrow-teal" style="color:#0F766E;">Catalog total</span>'
             f'<p class="card-num card-num-dark">{_fmt(catalog_price.total)}</p>'
             f'<span class="card-sub card-sub-dark">Rule-based · transparent</span></div>'
-            f'<div class="card-item card-item-dark"><span class="eyebrow eyebrow-teal" style="color:#0F766E;">Blend (65/35)</span>'
+            f'<div class="card-item card-item-dark"><span class="eyebrow eyebrow-teal" style="color:#0F766E;">Final recommendation</span>'
             f'<p class="card-num card-num-dark">{_fmt(recommended_price)} <small style="font-size:0.5em;font-style:italic;color:#0F766E;">↗</small></p>'
-            f'<span class="card-sub card-sub-dark">Recommended quote</span></div>'
+            f'<span class="card-sub card-sub-dark">65/35 blend + {market_weight}% market pull</span></div>'
             f"</div></div>",
             unsafe_allow_html=True,
         )
@@ -1199,7 +1286,7 @@ def main():
             "Where the score is weak, manual review takes the wheel.</p>",
             unsafe_allow_html=True,
         )
-        st.dataframe(build_data_source_map(), use_container_width=True, hide_index=True)
+        st.dataframe(build_data_source_map(), width="stretch", hide_index=True)
 
         st.markdown(
             "<hr style='border:0;border-top:1px solid #0A1F24;margin:32px 0 0;'>",
@@ -1262,7 +1349,7 @@ def main():
                 height=340,
                 showlegend=False,
             )
-            st.plotly_chart(fig_radar, use_container_width=True)
+            st.plotly_chart(fig_radar, width="stretch")
 
         with quote_col:
             st.markdown(
@@ -1315,7 +1402,7 @@ def main():
             ),
             title_text="",
         )
-        st.plotly_chart(fig_dist, use_container_width=True)
+        st.plotly_chart(fig_dist, width="stretch")
 
         st.markdown(
             "<hr style='border:0;border-top:1px solid #DDD6C5;margin:16px 0 24px;'>",
@@ -1338,7 +1425,7 @@ def main():
         out_df["final_price"] = out_df["final_price"].map(lambda x: f"${x:,.0f}")
         out_df["group_mean"] = out_df["group_mean"].map(lambda x: f"${x:,.0f}")
         out_df["z_score"] = out_df["z_score"].map(lambda x: f"{x:+.2f}")
-        st.dataframe(out_df, use_container_width=True, hide_index=True)
+        st.dataframe(out_df, width="stretch", hide_index=True)
 
         st.markdown(
             "<hr style='border:0;border-top:1px solid #0A1F24;margin:32px 0 0;'>",
@@ -1370,7 +1457,7 @@ def main():
             showlegend=False,
             height=320,
         )
-        st.plotly_chart(fig_trend, use_container_width=True)
+        st.plotly_chart(fig_trend, width="stretch")
 
     # =========================================================================
     # TAB 4 · WHY
@@ -1580,7 +1667,7 @@ def main():
                 },
             ]
         )
-        st.dataframe(process, use_container_width=True, hide_index=True)
+        st.dataframe(process, width="stretch", hide_index=True)
 
     # ── Footer ────────────────────────────────────────────────────────────────
     st.markdown(
@@ -1593,7 +1680,7 @@ def main():
     )
 
     with st.expander("Preview synthetic data"):
-        st.dataframe(df.head(20), use_container_width=True)
+        st.dataframe(df.head(20), width="stretch")
 
 
 if __name__ == "__main__":
