@@ -27,6 +27,7 @@ st.html(
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,400,0,0&display=block" rel="stylesheet">
 <style>
 :root {
   --ink:        #0A1F24;
@@ -63,18 +64,23 @@ header[data-testid="stHeader"] { background: var(--paper) !important; border-bot
   border-right: 1px solid var(--ink-3) !important;
 }
 [data-testid="stSidebar"] * { color: var(--paper) !important; font-family: var(--sans) !important; }
-[data-testid="stSidebar"] .material-symbols-rounded,
-[data-testid="stSidebar"] .material-symbols-outlined,
-[data-testid="stSidebar"] .material-icons {
+span[class*="material-symbols"],
+i[class*="material-icons"],
+.material-symbols-rounded,
+.material-symbols-outlined,
+.material-icons {
   font-family: "Material Symbols Rounded", "Material Symbols Outlined", "Material Icons" !important;
   font-weight: normal !important;
   font-style: normal !important;
+  font-size: 20px !important;
   line-height: 1 !important;
   letter-spacing: normal !important;
   text-transform: none !important;
   white-space: nowrap !important;
   word-wrap: normal !important;
   direction: ltr !important;
+  font-feature-settings: "liga" !important;
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 24 !important;
   -webkit-font-feature-settings: "liga" !important;
   -webkit-font-smoothing: antialiased !important;
 }
@@ -300,6 +306,33 @@ h3 {
 .status-ok { color: var(--teal-dim); background: var(--teal-soft); }
 .status-warning { color: var(--signal); background: var(--signal-soft); }
 .status-critical { color: #991B1B; background: #FEE2E2; }
+.status-bucket-a { color: #0F766E; background: #CCFBF1; }
+.status-bucket-b { color: #1B3F47; background: #EAE5DA; }
+.status-bucket-c { color: #F97316; background: #FED7AA; }
+.status-bucket-d { color: #991B1B; background: #FEE2E2; }
+.bucket-lane { border: 1px solid var(--ink); margin-bottom: 12px; }
+.bucket-lane-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--paper-2); border-bottom: 1px solid var(--ink); padding: 10px 12px; }
+.bucket-lane-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); }
+.bucket-lane-meta { font-family: var(--mono); font-size: 10px; color: var(--ink-3); }
+.bucket-sku { display: grid; grid-template-columns: minmax(170px, 1.4fr) repeat(3, minmax(72px, 0.6fr)); gap: 12px; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--paper-3); font-size: 13px; }
+.bucket-sku:last-child { border-bottom: 0; }
+.bucket-measure { font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+.health-grid { display: grid; grid-template-columns: repeat(2, minmax(260px, 1fr)); gap: 16px; margin-bottom: 24px; }
+.health-panel { border: 1px solid var(--ink); background: var(--paper); }
+.health-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; background: var(--paper-2); border-bottom: 1px solid var(--ink); }
+.health-panel-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink); }
+.health-row { display: grid; grid-template-columns: minmax(150px, 1fr) 72px 96px; gap: 12px; align-items: start; padding: 11px 14px; border-bottom: 1px solid var(--paper-3); font-size: 13px; }
+.health-row:last-child { border-bottom: 0; }
+.health-score { font-family: var(--serif); font-size: 26px; line-height: 0.95; letter-spacing: -0.02em; color: var(--ink); }
+.status-info { color: #1B3F47; background: #EAE5DA; }
+.governance-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1px; background: var(--ink); border: 1px solid var(--ink); margin: 0 0 24px; }
+.governance-cell { background: var(--paper); padding: 16px 14px; min-height: 106px; }
+.governance-cell strong { display: block; font-family: var(--serif); font-size: 30px; line-height: 0.95; letter-spacing: -0.02em; font-weight: 400; margin: 8px 0 4px; }
+.governance-flow { display: grid; grid-template-columns: repeat(5, minmax(130px, 1fr)); gap: 1px; background: var(--ink); border: 1px solid var(--ink); margin-bottom: 24px; }
+.governance-step { background: var(--paper-2); padding: 14px; min-height: 118px; }
+.governance-step-num { font-family: var(--mono); font-size: 10px; color: var(--teal-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.governance-step-title { font-weight: 600; font-size: 13px; margin: 8px 0 5px; color: var(--ink); }
+.governance-step-copy { font-size: 12.5px; line-height: 1.4; color: var(--ink-3); margin: 0; }
 .check-table { width: 100%; border-collapse: collapse; border: 1px solid var(--ink); font-size: 13px; }
 .check-table th { background: var(--paper-2); font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--ink); }
 .check-table td { padding: 11px 12px; border-bottom: 1px solid var(--paper-3); vertical-align: top; }
@@ -615,6 +648,862 @@ def product_correction_payload(df: pd.DataFrame) -> dict:
                 "set_end": str(row.expected_end),
             }
             for row in needs_fix.itertuples()
+        ],
+    }
+
+
+@st.cache_data
+def build_inventory_bucket_data(today: date | None = None) -> pd.DataFrame:
+    if today is None:
+        today = date.today()
+
+    records = [
+        {
+            "item_id": "PM-100",
+            "product": "Smart valve actuator",
+            "category": "Controls",
+            "current_stock": 420,
+            "unit_cost": 118.00,
+            "units_28d": 286,
+            "units_90d": 820,
+            "days_since_sale": 1,
+            "margin_pct": 30.2,
+        },
+        {
+            "item_id": "PM-220",
+            "product": "Filter replacement kit",
+            "category": "Maintenance",
+            "current_stock": 280,
+            "unit_cost": 42.50,
+            "units_28d": 382,
+            "units_90d": 1120,
+            "days_since_sale": 0,
+            "margin_pct": 33.6,
+        },
+        {
+            "item_id": "PM-480",
+            "product": "Weekly promo thermostat",
+            "category": "Campaign",
+            "current_stock": 140,
+            "unit_cost": 88.00,
+            "units_28d": 318,
+            "units_90d": 650,
+            "days_since_sale": 0,
+            "margin_pct": 26.1,
+        },
+        {
+            "item_id": "PM-340",
+            "product": "Sensor calibration bundle",
+            "category": "Service parts",
+            "current_stock": 190,
+            "unit_cost": 76.00,
+            "units_28d": 168,
+            "units_90d": 520,
+            "days_since_sale": 2,
+            "margin_pct": 32.1,
+        },
+        {
+            "item_id": "PM-410",
+            "product": "Hydronic balancing valve",
+            "category": "Controls",
+            "current_stock": 210,
+            "unit_cost": 64.00,
+            "units_28d": 126,
+            "units_90d": 380,
+            "days_since_sale": 3,
+            "margin_pct": 29.0,
+        },
+        {
+            "item_id": "PM-515",
+            "product": "Condensate pump kit",
+            "category": "Maintenance",
+            "current_stock": 165,
+            "unit_cost": 52.00,
+            "units_28d": 94,
+            "units_90d": 270,
+            "days_since_sale": 6,
+            "margin_pct": 27.4,
+        },
+        {
+            "item_id": "PM-605",
+            "product": "Pipe insulation sleeve",
+            "category": "Consumables",
+            "current_stock": 520,
+            "unit_cost": 9.80,
+            "units_28d": 82,
+            "units_90d": 260,
+            "days_since_sale": 5,
+            "margin_pct": 38.7,
+        },
+        {
+            "item_id": "PM-730",
+            "product": "Expansion vessel bracket",
+            "category": "Install parts",
+            "current_stock": 240,
+            "unit_cost": 18.50,
+            "units_28d": 54,
+            "units_90d": 190,
+            "days_since_sale": 9,
+            "margin_pct": 24.6,
+        },
+        {
+            "item_id": "PM-760",
+            "product": "Legacy controller faceplate",
+            "category": "Legacy",
+            "current_stock": 310,
+            "unit_cost": 21.00,
+            "units_28d": 22,
+            "units_90d": 86,
+            "days_since_sale": 18,
+            "margin_pct": 18.8,
+        },
+        {
+            "item_id": "PM-820",
+            "product": "Special order gasket",
+            "category": "Service parts",
+            "current_stock": 95,
+            "unit_cost": 14.00,
+            "units_28d": 12,
+            "units_90d": 48,
+            "days_since_sale": 24,
+            "margin_pct": 22.0,
+        },
+        {
+            "item_id": "PM-900",
+            "product": "Discontinued wall sensor",
+            "category": "Legacy",
+            "current_stock": 360,
+            "unit_cost": 36.00,
+            "units_28d": 4,
+            "units_90d": 18,
+            "days_since_sale": 72,
+            "margin_pct": 11.5,
+        },
+        {
+            "item_id": "PM-940",
+            "product": "Obsolete mounting rail",
+            "category": "Legacy",
+            "current_stock": 440,
+            "unit_cost": 7.50,
+            "units_28d": 2,
+            "units_90d": 9,
+            "days_since_sale": 96,
+            "margin_pct": 9.2,
+        },
+    ]
+
+    df = pd.DataFrame(records)
+    df["as_of"] = today
+    df["avg_daily_units"] = (df["units_28d"] / 28).round(1)
+    df["weekly_velocity"] = (df["avg_daily_units"] * 7).round(1)
+    df["sell_through_28d"] = (
+        df["units_28d"] / (df["current_stock"] + df["units_28d"]) * 100
+    ).round(1)
+    df["days_on_hand"] = (
+        df["current_stock"] / df["avg_daily_units"].replace(0, np.nan)
+    ).replace([np.inf, -np.inf], np.nan)
+    df["days_on_hand"] = df["days_on_hand"].fillna(999).round(0).astype(int)
+    df["inventory_value"] = (df["current_stock"] * df["unit_cost"]).round(0)
+    df["bucket"] = "C"
+    df["bucket_name"] = "C slow"
+    df.loc[
+        (df["avg_daily_units"] >= 7.0) | (df["sell_through_28d"] >= 45),
+        ["bucket", "bucket_name"],
+    ] = ["A", "A fast"]
+    df.loc[
+        df["bucket"].eq("C")
+        & ((df["avg_daily_units"] >= 2.5) | (df["sell_through_28d"] >= 22)),
+        ["bucket", "bucket_name"],
+    ] = ["B", "B steady"]
+    df.loc[
+        (df["days_since_sale"] >= 60) | (df["units_28d"] <= 5),
+        ["bucket", "bucket_name"],
+    ] = ["D", "D stale"]
+    df["action"] = df["bucket"].map(
+        {
+            "A": "Protect availability; avoid deep discounting",
+            "B": "Review reorder point and price tests",
+            "C": "Reduce buy quantity or bundle into service offers",
+            "D": "Markdown, return, or remove from active catalog",
+        }
+    )
+    return df.sort_values(["bucket", "weekly_velocity"], ascending=[True, False])
+
+
+def inventory_bucket_payload(df: pd.DataFrame) -> dict:
+    summary = (
+        df.groupby("bucket")
+        .agg(
+            items=("item_id", "count"),
+            stock_units=("current_stock", "sum"),
+            inventory_value=("inventory_value", "sum"),
+            weekly_velocity=("weekly_velocity", "sum"),
+        )
+        .reset_index()
+    )
+    return {
+        "control": "inventory_velocity_buckets",
+        "source": "synthetic inventory ledger",
+        "bucket_rules": {
+            "A": "Fast movers: high 28-day velocity or sell-through",
+            "B": "Steady movers: predictable but lower velocity",
+            "C": "Slow movers: low movement, still recently sold",
+            "D": "Stale: no recent demand or 28-day units near zero",
+        },
+        "summary": [
+            {
+                "bucket": row.bucket,
+                "items": int(row.items),
+                "stock_units": int(row.stock_units),
+                "inventory_value": int(row.inventory_value),
+                "weekly_velocity": round(float(row.weekly_velocity), 1),
+            }
+            for row in summary.itertuples()
+        ],
+        "stale_items": [
+            {
+                "item_id": row.item_id,
+                "product": row.product,
+                "stock_units": int(row.current_stock),
+                "inventory_value": int(row.inventory_value),
+                "days_since_sale": int(row.days_since_sale),
+                "action": row.action,
+            }
+            for row in df[df["bucket"].eq("D")].itertuples()
+        ],
+    }
+
+
+@st.cache_data
+def build_product_health_data(today: date | None = None) -> pd.DataFrame:
+    if today is None:
+        today = date.today()
+
+    records = [
+        {
+            "item_id": "PM-100",
+            "product": "Smart valve actuator",
+            "category": "Controls",
+            "lifecycle": "Active",
+            "description_score": 92,
+            "missing_fields": 0,
+            "return_rate_pct": 2.1,
+            "refund_pct": 0.7,
+            "refund_value": 420,
+            "return_reason": "Normal warranty mix",
+            "days_since_sale": 1,
+            "stock_units": 420,
+            "unit_cost": 118.00,
+            "margin_pct": 30.2,
+            "discount_rate_pct": 6.0,
+        },
+        {
+            "item_id": "PM-220",
+            "product": "Filter replacement kit",
+            "category": "Maintenance",
+            "lifecycle": "Active",
+            "description_score": 81,
+            "missing_fields": 1,
+            "return_rate_pct": 4.4,
+            "refund_pct": 1.5,
+            "refund_value": 760,
+            "return_reason": "Wrong filter size selected",
+            "days_since_sale": 0,
+            "stock_units": 280,
+            "unit_cost": 42.50,
+            "margin_pct": 33.6,
+            "discount_rate_pct": 8.0,
+        },
+        {
+            "item_id": "PM-340",
+            "product": "Sensor calibration bundle",
+            "category": "Service parts",
+            "lifecycle": "Active",
+            "description_score": 68,
+            "missing_fields": 2,
+            "return_rate_pct": 9.8,
+            "refund_pct": 4.6,
+            "refund_value": 2200,
+            "return_reason": "Compatibility unclear",
+            "days_since_sale": 2,
+            "stock_units": 190,
+            "unit_cost": 76.00,
+            "margin_pct": 32.1,
+            "discount_rate_pct": 11.0,
+        },
+        {
+            "item_id": "PM-480",
+            "product": "Weekly promo thermostat",
+            "category": "Campaign",
+            "lifecycle": "Promo",
+            "description_score": 74,
+            "missing_fields": 1,
+            "return_rate_pct": 11.4,
+            "refund_pct": 5.2,
+            "refund_value": 3180,
+            "return_reason": "Feature expectation mismatch",
+            "days_since_sale": 0,
+            "stock_units": 140,
+            "unit_cost": 88.00,
+            "margin_pct": 26.1,
+            "discount_rate_pct": 28.0,
+        },
+        {
+            "item_id": "PM-410",
+            "product": "Hydronic balancing valve",
+            "category": "Controls",
+            "lifecycle": "Active",
+            "description_score": 88,
+            "missing_fields": 0,
+            "return_rate_pct": 3.6,
+            "refund_pct": 1.1,
+            "refund_value": 540,
+            "return_reason": "Normal install variance",
+            "days_since_sale": 3,
+            "stock_units": 210,
+            "unit_cost": 64.00,
+            "margin_pct": 29.0,
+            "discount_rate_pct": 7.5,
+        },
+        {
+            "item_id": "PM-515",
+            "product": "Condensate pump kit",
+            "category": "Maintenance",
+            "lifecycle": "Active",
+            "description_score": 58,
+            "missing_fields": 3,
+            "return_rate_pct": 7.9,
+            "refund_pct": 2.8,
+            "refund_value": 1280,
+            "return_reason": "Missing installation notes",
+            "days_since_sale": 6,
+            "stock_units": 165,
+            "unit_cost": 52.00,
+            "margin_pct": 27.4,
+            "discount_rate_pct": 12.0,
+        },
+        {
+            "item_id": "PM-730",
+            "product": "Expansion vessel bracket",
+            "category": "Install parts",
+            "lifecycle": "Phase-out",
+            "description_score": 76,
+            "missing_fields": 1,
+            "return_rate_pct": 5.7,
+            "refund_pct": 2.2,
+            "refund_value": 610,
+            "return_reason": "Wrong fitment",
+            "days_since_sale": 9,
+            "stock_units": 240,
+            "unit_cost": 18.50,
+            "margin_pct": 24.6,
+            "discount_rate_pct": 18.0,
+        },
+        {
+            "item_id": "PM-760",
+            "product": "Legacy controller faceplate",
+            "category": "Legacy",
+            "lifecycle": "Phase-out",
+            "description_score": 49,
+            "missing_fields": 4,
+            "return_rate_pct": 13.6,
+            "refund_pct": 6.4,
+            "refund_value": 1850,
+            "return_reason": "Legacy compatibility unclear",
+            "days_since_sale": 18,
+            "stock_units": 310,
+            "unit_cost": 21.00,
+            "margin_pct": 18.8,
+            "discount_rate_pct": 22.0,
+        },
+        {
+            "item_id": "PM-820",
+            "product": "Special order gasket",
+            "category": "Service parts",
+            "lifecycle": "Active",
+            "description_score": 63,
+            "missing_fields": 2,
+            "return_rate_pct": 6.2,
+            "refund_pct": 2.4,
+            "refund_value": 420,
+            "return_reason": "Wrong dimensions selected",
+            "days_since_sale": 24,
+            "stock_units": 95,
+            "unit_cost": 14.00,
+            "margin_pct": 22.0,
+            "discount_rate_pct": 9.0,
+        },
+        {
+            "item_id": "PM-900",
+            "product": "Discontinued wall sensor",
+            "category": "Legacy",
+            "lifecycle": "Discontinued",
+            "description_score": 42,
+            "missing_fields": 5,
+            "return_rate_pct": 16.8,
+            "refund_pct": 8.5,
+            "refund_value": 2480,
+            "return_reason": "Product substituted or unsupported",
+            "days_since_sale": 72,
+            "stock_units": 360,
+            "unit_cost": 36.00,
+            "margin_pct": 11.5,
+            "discount_rate_pct": 34.0,
+        },
+        {
+            "item_id": "PM-940",
+            "product": "Obsolete mounting rail",
+            "category": "Legacy",
+            "lifecycle": "Obsolete",
+            "description_score": 35,
+            "missing_fields": 6,
+            "return_rate_pct": 10.2,
+            "refund_pct": 5.9,
+            "refund_value": 720,
+            "return_reason": "No matching replacement shown",
+            "days_since_sale": 96,
+            "stock_units": 440,
+            "unit_cost": 7.50,
+            "margin_pct": 9.2,
+            "discount_rate_pct": 41.0,
+        },
+    ]
+
+    df = pd.DataFrame(records)
+    df["as_of"] = today
+    df["inventory_value"] = (df["stock_units"] * df["unit_cost"]).round(0)
+    df["master_data_issue"] = (df["description_score"] < 75) | (df["missing_fields"] > 0)
+    df["returns_issue"] = (df["return_rate_pct"] >= 8) | (df["refund_pct"] >= 4)
+    df["scrap_candidate"] = (
+        df["lifecycle"].isin(["Discontinued", "Obsolete"])
+        & (df["days_since_sale"] >= 60)
+    )
+    df["margin_issue"] = (df["margin_pct"] < 15) | (df["discount_rate_pct"] >= 30)
+    df["scrap_value"] = np.where(df["scrap_candidate"], df["inventory_value"], 0)
+    df["issue_count"] = df[
+        ["master_data_issue", "returns_issue", "scrap_candidate", "margin_issue"]
+    ].sum(axis=1)
+    df["health_status"] = "OK"
+    df.loc[df["issue_count"].between(1, 2), "health_status"] = "Review"
+    df.loc[df["issue_count"].ge(3), "health_status"] = "Critical"
+    df["recommended_action"] = "Monitor in normal product review"
+    df.loc[df["master_data_issue"], "recommended_action"] = "Repair catalog fields and description"
+    df.loc[df["returns_issue"], "recommended_action"] = "Investigate return reason and refund leakage"
+    df.loc[df["margin_issue"], "recommended_action"] = "Reset margin floor or discount guardrail"
+    df.loc[df["scrap_candidate"], "recommended_action"] = "Route to markdown, return, or scrap approval"
+    return df.sort_values(["issue_count", "refund_value"], ascending=[False, False])
+
+
+def product_health_payload(df: pd.DataFrame) -> dict:
+    return {
+        "control": "product_health_monitor",
+        "source": "synthetic product operations ledger",
+        "as_of": str(df["as_of"].iloc[0]),
+        "summary": {
+            "products_checked": int(len(df)),
+            "master_data_issues": int(df["master_data_issue"].sum()),
+            "returns_refunds_issues": int(df["returns_issue"].sum()),
+            "scrap_candidates": int(df["scrap_candidate"].sum()),
+            "margin_leakage_items": int(df["margin_issue"].sum()),
+            "scrap_value": int(df["scrap_value"].sum()),
+            "refund_value": int(df.loc[df["returns_issue"], "refund_value"].sum()),
+        },
+        "critical_items": [
+            {
+                "item_id": row.item_id,
+                "product": row.product,
+                "lifecycle": row.lifecycle,
+                "issue_count": int(row.issue_count),
+                "return_rate_pct": round(float(row.return_rate_pct), 1),
+                "margin_pct": round(float(row.margin_pct), 1),
+                "scrap_value": int(row.scrap_value),
+                "action": row.recommended_action,
+            }
+            for row in df[df["health_status"].eq("Critical")].itertuples()
+        ],
+    }
+
+
+@st.cache_data
+def build_product_governance_data(today: date | None = None) -> pd.DataFrame:
+    if today is None:
+        today = date.today()
+
+    records = [
+        {
+            "item_id": "PM-100",
+            "product": "Smart valve actuator",
+            "local_category": "Controls",
+            "reference_class": "Valve and flow-control component",
+            "reference_code": "8481.80",
+            "local_material": "Steel",
+            "reference_material": "Steel",
+            "local_uom": "Each",
+            "reference_packaging": "Each",
+            "origin_master": "DE",
+            "origin_supplier": "DE",
+            "lifecycle": "Active",
+            "launch_price": True,
+            "launch_description": True,
+            "launch_image": True,
+            "launch_compliance": True,
+            "launch_stock": True,
+            "old_cost": 112.00,
+            "new_cost": 118.00,
+            "current_price": 169.00,
+            "target_margin_pct": 24.0,
+            "replacement_sku": "",
+            "sales_quotes_old_sku": 0,
+            "owner": "Product ops",
+        },
+        {
+            "item_id": "PM-220",
+            "product": "Filter replacement kit",
+            "local_category": "Maintenance",
+            "reference_class": "Replaceable filtering apparatus part",
+            "reference_code": "8421.99",
+            "local_material": "Paper media",
+            "reference_material": "Paper media",
+            "local_uom": "Kit",
+            "reference_packaging": "Set/kit",
+            "origin_master": "FI",
+            "origin_supplier": "FI",
+            "lifecycle": "Active",
+            "launch_price": True,
+            "launch_description": True,
+            "launch_image": False,
+            "launch_compliance": True,
+            "launch_stock": True,
+            "old_cost": 39.00,
+            "new_cost": 42.50,
+            "current_price": 64.00,
+            "target_margin_pct": 28.0,
+            "replacement_sku": "",
+            "sales_quotes_old_sku": 0,
+            "owner": "Catalog team",
+        },
+        {
+            "item_id": "PM-340",
+            "product": "Sensor calibration bundle",
+            "local_category": "Service parts",
+            "reference_class": "Electronic measuring instrument accessory",
+            "reference_code": "9031.90",
+            "local_material": "Mixed",
+            "reference_material": "Electronic assembly",
+            "local_uom": "Each",
+            "reference_packaging": "Set/kit",
+            "origin_master": "",
+            "origin_supplier": "EE",
+            "lifecycle": "Active",
+            "launch_price": True,
+            "launch_description": False,
+            "launch_image": True,
+            "launch_compliance": False,
+            "launch_stock": True,
+            "old_cost": 68.00,
+            "new_cost": 76.00,
+            "current_price": 112.00,
+            "target_margin_pct": 30.0,
+            "replacement_sku": "",
+            "sales_quotes_old_sku": 0,
+            "owner": "Compliance",
+        },
+        {
+            "item_id": "PM-480",
+            "product": "Weekly promo thermostat",
+            "local_category": "Campaign",
+            "reference_class": "Automatic regulating instrument",
+            "reference_code": "9032.10",
+            "local_material": "Plastic",
+            "reference_material": "Electronic assembly",
+            "local_uom": "Each",
+            "reference_packaging": "Each",
+            "origin_master": "CN",
+            "origin_supplier": "CN",
+            "lifecycle": "Promo",
+            "launch_price": True,
+            "launch_description": True,
+            "launch_image": True,
+            "launch_compliance": False,
+            "launch_stock": True,
+            "old_cost": 72.00,
+            "new_cost": 88.00,
+            "current_price": 119.00,
+            "target_margin_pct": 25.0,
+            "replacement_sku": "",
+            "sales_quotes_old_sku": 0,
+            "owner": "Campaign owner",
+        },
+        {
+            "item_id": "PM-410",
+            "product": "Hydronic balancing valve",
+            "local_category": "Controls",
+            "reference_class": "Valve and flow-control component",
+            "reference_code": "8481.80",
+            "local_material": "Brass",
+            "reference_material": "Base metal",
+            "local_uom": "Each",
+            "reference_packaging": "Each",
+            "origin_master": "IT",
+            "origin_supplier": "IT",
+            "lifecycle": "Active",
+            "launch_price": True,
+            "launch_description": True,
+            "launch_image": True,
+            "launch_compliance": True,
+            "launch_stock": True,
+            "old_cost": 58.00,
+            "new_cost": 64.00,
+            "current_price": 94.00,
+            "target_margin_pct": 26.0,
+            "replacement_sku": "",
+            "sales_quotes_old_sku": 0,
+            "owner": "Product ops",
+        },
+        {
+            "item_id": "PM-515",
+            "product": "Condensate pump kit",
+            "local_category": "Maintenance",
+            "reference_class": "Liquid pump assembly",
+            "reference_code": "8413.70",
+            "local_material": "Plastic",
+            "reference_material": "Electromechanical assembly",
+            "local_uom": "Each",
+            "reference_packaging": "Set/kit",
+            "origin_master": "PL",
+            "origin_supplier": "CZ",
+            "lifecycle": "Active",
+            "launch_price": True,
+            "launch_description": False,
+            "launch_image": False,
+            "launch_compliance": False,
+            "launch_stock": True,
+            "old_cost": 43.00,
+            "new_cost": 52.00,
+            "current_price": 72.00,
+            "target_margin_pct": 27.0,
+            "replacement_sku": "",
+            "sales_quotes_old_sku": 0,
+            "owner": "Catalog team",
+        },
+        {
+            "item_id": "PM-730",
+            "product": "Expansion vessel bracket",
+            "local_category": "Install parts",
+            "reference_class": "Base-metal mounting article",
+            "reference_code": "7326.90",
+            "local_material": "Steel",
+            "reference_material": "Steel",
+            "local_uom": "Each",
+            "reference_packaging": "Each",
+            "origin_master": "SE",
+            "origin_supplier": "SE",
+            "lifecycle": "Phase-out",
+            "launch_price": True,
+            "launch_description": True,
+            "launch_image": True,
+            "launch_compliance": True,
+            "launch_stock": True,
+            "old_cost": 15.50,
+            "new_cost": 18.50,
+            "current_price": 28.00,
+            "target_margin_pct": 25.0,
+            "replacement_sku": "PM-731",
+            "sales_quotes_old_sku": 12,
+            "owner": "Product ops",
+        },
+        {
+            "item_id": "PM-760",
+            "product": "Legacy controller faceplate",
+            "local_category": "Legacy",
+            "reference_class": "Plastic enclosure part",
+            "reference_code": "3926.90",
+            "local_material": "Aluminium",
+            "reference_material": "Plastic",
+            "local_uom": "Each",
+            "reference_packaging": "Each",
+            "origin_master": "",
+            "origin_supplier": "CN",
+            "lifecycle": "Phase-out",
+            "launch_price": True,
+            "launch_description": False,
+            "launch_image": False,
+            "launch_compliance": False,
+            "launch_stock": True,
+            "old_cost": 17.00,
+            "new_cost": 21.00,
+            "current_price": 31.00,
+            "target_margin_pct": 24.0,
+            "replacement_sku": "PM-761",
+            "sales_quotes_old_sku": 28,
+            "owner": "Lifecycle owner",
+        },
+        {
+            "item_id": "PM-900",
+            "product": "Discontinued wall sensor",
+            "local_category": "Legacy",
+            "reference_class": "Electronic sensor apparatus",
+            "reference_code": "9026.80",
+            "local_material": "Plastic",
+            "reference_material": "Electronic assembly",
+            "local_uom": "Each",
+            "reference_packaging": "Each",
+            "origin_master": "CN",
+            "origin_supplier": "",
+            "lifecycle": "Discontinued",
+            "launch_price": False,
+            "launch_description": False,
+            "launch_image": False,
+            "launch_compliance": False,
+            "launch_stock": True,
+            "old_cost": 29.00,
+            "new_cost": 36.00,
+            "current_price": 41.00,
+            "target_margin_pct": 22.0,
+            "replacement_sku": "",
+            "sales_quotes_old_sku": 46,
+            "owner": "Lifecycle owner",
+        },
+        {
+            "item_id": "PM-940",
+            "product": "Obsolete mounting rail",
+            "local_category": "Legacy",
+            "reference_class": "Base-metal mounting article",
+            "reference_code": "7326.90",
+            "local_material": "Unknown",
+            "reference_material": "Steel",
+            "local_uom": "Meter",
+            "reference_packaging": "Each",
+            "origin_master": "",
+            "origin_supplier": "",
+            "lifecycle": "Obsolete",
+            "launch_price": False,
+            "launch_description": False,
+            "launch_image": False,
+            "launch_compliance": False,
+            "launch_stock": True,
+            "old_cost": 6.20,
+            "new_cost": 7.50,
+            "current_price": 8.25,
+            "target_margin_pct": 20.0,
+            "replacement_sku": "PM-941",
+            "sales_quotes_old_sku": 18,
+            "owner": "Lifecycle owner",
+        },
+    ]
+
+    df = pd.DataFrame(records)
+    df["as_of"] = today
+    launch_cols = [
+        "launch_price",
+        "launch_description",
+        "launch_image",
+        "launch_compliance",
+        "launch_stock",
+    ]
+    df["launch_ready_score"] = (df[launch_cols].sum(axis=1) / len(launch_cols) * 100).round(0).astype(int)
+    df["class_mismatch"] = ~df.apply(
+        lambda row: str(row.local_category).lower() in str(row.reference_class).lower()
+        or (
+            row.local_category in ["Controls", "Campaign"]
+            and any(term in row.reference_class.lower() for term in ["valve", "instrument"])
+        )
+        or (
+            row.local_category in ["Install parts", "Legacy"]
+            and any(term in row.reference_class.lower() for term in ["mounting", "enclosure", "sensor"])
+        )
+        or (
+            row.local_category == "Maintenance"
+            and any(term in row.reference_class.lower() for term in ["filter", "pump"])
+        ),
+        axis=1,
+    )
+    df["material_mismatch"] = ~df.apply(
+        lambda row: row.local_material == row.reference_material
+        or row.local_material in row.reference_material
+        or row.reference_material in ["Base metal", "Electronic assembly", "Electromechanical assembly"],
+        axis=1,
+    )
+    df["origin_issue"] = (
+        df["origin_master"].eq("")
+        | df["origin_supplier"].eq("")
+        | df["origin_master"].ne(df["origin_supplier"])
+    )
+    df["packaging_mismatch"] = ~df.apply(
+        lambda row: row.local_uom == row.reference_packaging
+        or (row.local_uom == "Kit" and row.reference_packaging == "Set/kit"),
+        axis=1,
+    )
+    df["cost_change_pct"] = ((df["new_cost"] - df["old_cost"]) / df["old_cost"] * 100).round(1)
+    df["margin_after_cost_pct"] = ((df["current_price"] - df["new_cost"]) / df["current_price"] * 100).round(1)
+    df["needs_reprice"] = (
+        (df["cost_change_pct"].abs() >= 10)
+        | (df["margin_after_cost_pct"] < df["target_margin_pct"])
+    )
+    df["replacement_gap"] = (
+        df["lifecycle"].isin(["Phase-out", "Discontinued", "Obsolete"])
+        & (df["sales_quotes_old_sku"] > 0)
+        & (df["replacement_sku"].eq(""))
+    )
+    df["data_conflict_count"] = df[
+        ["class_mismatch", "material_mismatch", "origin_issue", "packaging_mismatch"]
+    ].sum(axis=1)
+    df["governance_issue_count"] = df[
+        [
+            "class_mismatch",
+            "material_mismatch",
+            "origin_issue",
+            "packaging_mismatch",
+            "needs_reprice",
+            "replacement_gap",
+        ]
+    ].sum(axis=1) + (df["launch_ready_score"] < 80).astype(int)
+    df["governance_status"] = "OK"
+    df.loc[df["governance_issue_count"].between(1, 2), "governance_status"] = "Review"
+    df.loc[df["governance_issue_count"].ge(3), "governance_status"] = "Critical"
+    df["workflow_stage"] = "Monitor"
+    df.loc[df["launch_ready_score"] < 80, "workflow_stage"] = "Launch readiness"
+    df.loc[df["needs_reprice"], "workflow_stage"] = "Reprice"
+    df.loc[df["data_conflict_count"].gt(0), "workflow_stage"] = "Data stewardship"
+    df.loc[df["replacement_gap"], "workflow_stage"] = "Lifecycle mapping"
+    df["recommended_action"] = "No governance action needed"
+    df.loc[df["launch_ready_score"] < 80, "recommended_action"] = "Complete launch checklist before channel publish"
+    df.loc[df["needs_reprice"], "recommended_action"] = "Review supplier cost change and reset price floor"
+    df.loc[df["data_conflict_count"].gt(0), "recommended_action"] = "Review local master data against classification reference"
+    df.loc[df["replacement_gap"], "recommended_action"] = "Assign replacement SKU and block old-SKU quoting"
+    return df.sort_values(["governance_issue_count", "cost_change_pct"], ascending=[False, False])
+
+
+def product_governance_payload(df: pd.DataFrame) -> dict:
+    return {
+        "control": "product_data_governance",
+        "source": "synthetic PIM, supplier, and classification reference checks",
+        "classification_note": (
+            "Reference codes are used to detect product-master contradictions; "
+            "they are not treated as binding customs classifications."
+        ),
+        "as_of": str(df["as_of"].iloc[0]),
+        "summary": {
+            "products_checked": int(len(df)),
+            "classification_conflicts": int(df["data_conflict_count"].gt(0).sum()),
+            "launch_not_ready": int((df["launch_ready_score"] < 80).sum()),
+            "reprice_needed": int(df["needs_reprice"].sum()),
+            "replacement_gaps": int(df["replacement_gap"].sum()),
+            "critical_items": int(df["governance_status"].eq("Critical").sum()),
+        },
+        "actions": [
+            {
+                "item_id": row.item_id,
+                "product": row.product,
+                "owner": row.owner,
+                "stage": row.workflow_stage,
+                "status": row.governance_status,
+                "reference_code": row.reference_code,
+                "launch_ready_score": int(row.launch_ready_score),
+                "cost_change_pct": round(float(row.cost_change_pct), 1),
+                "action": row.recommended_action,
+            }
+            for row in df[df["governance_status"].ne("OK")].itertuples()
         ],
     }
 
@@ -1207,8 +2096,19 @@ def main():
     )
 
     # ── Tabs ──────────────────────────────────────────────────────────────────
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs(
-        ["Quote", "Data", "History", "Why", "Product Check", "Stock Forecast", "Handoff"]
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs(
+        [
+            "Quote",
+            "Data",
+            "History",
+            "Why",
+            "Product Check",
+            "Product Health",
+            "Governance",
+            "Buckets",
+            "Stock Forecast",
+            "Handoff",
+        ]
     )
 
     # =========================================================================
@@ -2020,9 +2920,659 @@ def main():
             st.dataframe(product_process, width="stretch", hide_index=True)
 
     # =========================================================================
-    # TAB 6 · STOCK FORECAST
+    # TAB 6 · PRODUCT HEALTH
     # =========================================================================
     with tab6:
+        health_df = build_product_health_data()
+        master_issues = health_df[health_df["master_data_issue"]]
+        returns_issues = health_df[health_df["returns_issue"]]
+        scrap_candidates = health_df[health_df["scrap_candidate"]]
+        margin_issues = health_df[health_df["margin_issue"]]
+        critical_count = int(health_df["health_status"].eq("Critical").sum())
+        review_count = int(health_df["health_status"].eq("Review").sum())
+        refund_at_risk = float(returns_issues["refund_value"].sum())
+        scrap_value = float(scrap_candidates["scrap_value"].sum())
+
+        st.markdown(
+            '<span class="eyebrow">Product health · operating exceptions</span>'
+            "<h2>One queue for products that are hard to sell, costly to return, or ready to retire.</h2>"
+            '<p style="font-size:13px;color:#1B3F47;max-width:660px;line-height:1.5;margin-bottom:24px;">'
+            "This combines the product-management controls that usually sit around pricing: catalog "
+            "description quality, returns and refund leakage, obsolete stock moving toward scrap, and "
+            "margin erosion caused by discounting or stale cost-price alignment.</p>",
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            f'<div class="card-grid">'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">Products checked</span>'
+            f'<p class="card-num">{len(health_df)}</p><span class="card-sub">{critical_count} critical · {review_count} review</span></div>'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">Master data issues</span>'
+            f'<p class="card-num">{len(master_issues)}</p><span class="card-sub">Description or required field gaps</span></div>'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">Refund value flagged</span>'
+            f'<p class="card-num">${refund_at_risk/1000:.1f}k</p><span class="card-sub">High return/refund products</span></div>'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">Scrap watch</span>'
+            f'<p class="card-num">${scrap_value/1000:.1f}k</p><span class="card-sub">{len(scrap_candidates)} obsolete candidates</span></div>'
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+
+        def health_panel(title: str, rows: pd.DataFrame, score: str, meta: str) -> str:
+            body = (
+                '<div class="health-row">'
+                "<div><strong>No exceptions</strong><br><span class='check-muted'>Queue is clear</span></div>"
+                '<div class="health-score">0</div>'
+                '<div><span class="status-pill status-ok">OK</span></div>'
+                "</div>"
+            )
+            if not rows.empty:
+                body = ""
+                for row in rows.head(4).itertuples():
+                    status_class = (
+                        "status-critical"
+                        if row.health_status == "Critical"
+                        else "status-warning"
+                    )
+                    body += (
+                        '<div class="health-row">'
+                        f"<div><strong>{row.item_id}</strong><br><span class='check-muted'>{row.product}</span></div>"
+                        f'<div><span class="health-score">{score(row)}</span><br><span class="check-muted">{meta(row)}</span></div>'
+                        f'<div><span class="status-pill {status_class}">{row.health_status}</span></div>'
+                        "</div>"
+                    )
+            return (
+                '<div class="health-panel">'
+                '<div class="health-panel-head">'
+                f'<span class="health-panel-title">{title}</span>'
+                f'<span class="bucket-lane-meta">{len(rows)} items</span>'
+                "</div>"
+                f"{body}</div>"
+            )
+
+        panels = (
+            health_panel(
+                "Master data issues",
+                master_issues.sort_values(["description_score", "missing_fields"]),
+                lambda row: f"{int(row.description_score)}",
+                lambda row: f"{int(row.missing_fields)} missing",
+            )
+            + health_panel(
+                "Returns / refunds",
+                returns_issues.sort_values("refund_value", ascending=False),
+                lambda row: f"{row.return_rate_pct:.1f}%",
+                lambda row: f"${row.refund_value/1000:.1f}k refunds",
+            )
+            + health_panel(
+                "Obsolete / scrap",
+                scrap_candidates.sort_values("scrap_value", ascending=False),
+                lambda row: f"${row.scrap_value/1000:.1f}k",
+                lambda row: f"{int(row.days_since_sale)}d no sale",
+            )
+            + health_panel(
+                "Margin leakage",
+                margin_issues.sort_values("margin_pct"),
+                lambda row: f"{row.margin_pct:.1f}%",
+                lambda row: f"{row.discount_rate_pct:.0f}% discount",
+            )
+        )
+        st.markdown(f'<div class="health-grid">{panels}</div>', unsafe_allow_html=True)
+
+        health_left, health_right = st.columns([1, 1])
+        with health_left:
+            issue_summary = pd.DataFrame(
+                [
+                    {
+                        "Area": "Master data",
+                        "Items": len(master_issues),
+                        "Value": 0,
+                    },
+                    {
+                        "Area": "Returns/refunds",
+                        "Items": len(returns_issues),
+                        "Value": refund_at_risk,
+                    },
+                    {
+                        "Area": "Scrap watch",
+                        "Items": len(scrap_candidates),
+                        "Value": scrap_value,
+                    },
+                    {
+                        "Area": "Margin leakage",
+                        "Items": len(margin_issues),
+                        "Value": float(margin_issues["inventory_value"].sum()),
+                    },
+                ]
+            )
+            fig_issues = px.bar(
+                issue_summary,
+                x="Area",
+                y="Items",
+                color="Area",
+                text="Items",
+                color_discrete_map={
+                    "Master data": "#1B3F47",
+                    "Returns/refunds": "#F97316",
+                    "Scrap watch": "#991B1B",
+                    "Margin leakage": "#14B8A6",
+                },
+            )
+            _apply_theme(fig_issues)
+            fig_issues.update_layout(
+                title_text="Exception count by product-control area",
+                height=330,
+                showlegend=False,
+                xaxis_title="",
+                yaxis_title="Products",
+            )
+            st.plotly_chart(fig_issues, width="stretch")
+
+        with health_right:
+            fig_return_margin = px.scatter(
+                health_df,
+                x="return_rate_pct",
+                y="margin_pct",
+                size="refund_value",
+                color="health_status",
+                hover_name="product",
+                hover_data={
+                    "item_id": True,
+                    "lifecycle": True,
+                    "refund_value": ":$,.0f",
+                    "discount_rate_pct": ":.1f",
+                    "health_status": False,
+                },
+                color_discrete_map={
+                    "OK": "#14B8A6",
+                    "Review": "#F97316",
+                    "Critical": "#991B1B",
+                },
+                category_orders={"health_status": ["OK", "Review", "Critical"]},
+            )
+            fig_return_margin.add_hline(
+                y=15,
+                line_color="#991B1B",
+                line_dash="dash",
+                annotation_text="Margin floor",
+                annotation_font=dict(
+                    family="Geist Mono, monospace", size=10, color="#991B1B"
+                ),
+            )
+            fig_return_margin.add_vline(
+                x=8,
+                line_color="#F97316",
+                line_dash="dash",
+                annotation_text="Return threshold",
+                annotation_font=dict(
+                    family="Geist Mono, monospace", size=10, color="#F97316"
+                ),
+            )
+            _apply_theme(fig_return_margin)
+            fig_return_margin.update_layout(
+                title_text="Returns against margin floor",
+                height=330,
+                legend=dict(
+                    font=dict(family="Geist Mono, monospace", size=10),
+                    title_text="",
+                ),
+                xaxis_title="Return rate %",
+                yaxis_title="Margin %",
+            )
+            st.plotly_chart(fig_return_margin, width="stretch")
+
+        st.markdown(
+            "<hr style='border:0;border-top:1px solid #0A1F24;margin:32px 0 24px;'>",
+            unsafe_allow_html=True,
+        )
+        health_queue_col, health_payload_col = st.columns([1.3, 1])
+        with health_queue_col:
+            st.markdown(
+                '<span class="eyebrow">Unified action queue</span>',
+                unsafe_allow_html=True,
+            )
+            queue = health_df[health_df["issue_count"].gt(0)][
+                [
+                    "health_status",
+                    "item_id",
+                    "product",
+                    "lifecycle",
+                    "description_score",
+                    "return_rate_pct",
+                    "refund_pct",
+                    "margin_pct",
+                    "scrap_value",
+                    "recommended_action",
+                ]
+            ].rename(
+                columns={
+                    "health_status": "Status",
+                    "item_id": "Item",
+                    "product": "Product",
+                    "lifecycle": "Lifecycle",
+                    "description_score": "Description score",
+                    "return_rate_pct": "Return %",
+                    "refund_pct": "Refund %",
+                    "margin_pct": "Margin %",
+                    "scrap_value": "Scrap value",
+                    "recommended_action": "Action",
+                }
+            )
+            st.dataframe(queue, width="stretch", hide_index=True)
+
+        with health_payload_col:
+            st.markdown(
+                '<span class="eyebrow" style="color:#0F766E;">Health payload</span>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f'<pre class="code-block">{json.dumps(product_health_payload(health_df), indent=2)}</pre>',
+                unsafe_allow_html=True,
+            )
+
+    # =========================================================================
+    # TAB 7 · GOVERNANCE
+    # =========================================================================
+    with tab7:
+        governance_df = build_product_governance_data()
+        conflicts = governance_df[governance_df["data_conflict_count"].gt(0)]
+        launch_not_ready = governance_df[governance_df["launch_ready_score"] < 80]
+        reprice_needed = governance_df[governance_df["needs_reprice"]]
+        replacement_gaps = governance_df[governance_df["replacement_gap"]]
+        critical_governance = governance_df[governance_df["governance_status"].eq("Critical")]
+
+        st.markdown(
+            '<span class="eyebrow">Product governance · classification-informed validation</span>'
+            "<h2>Use reference data to find contradictions, then route the product to an owner.</h2>"
+            '<p style="font-size:13px;color:#1B3F47;max-width:700px;line-height:1.5;margin-bottom:24px;">'
+            "This does not claim to classify products for customs. It uses HS-style reference fields as "
+            "a governance signal: if the reference class implies a steel mounting article but the local "
+            "master says unknown material, meter unit, or missing origin, the product is held for review. "
+            "The same view covers launch readiness, supplier cost changes, replacement mapping, and workflow ownership.</p>",
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            f'<div class="governance-strip">'
+            f'<div class="governance-cell"><span class="eyebrow eyebrow-teal">Conflicts</span>'
+            f'<strong>{len(conflicts)}</strong><span class="card-sub">Classification reference vs local master</span></div>'
+            f'<div class="governance-cell"><span class="eyebrow eyebrow-teal">Launch not ready</span>'
+            f'<strong>{len(launch_not_ready)}</strong><span class="card-sub">Missing price, content, compliance, or stock</span></div>'
+            f'<div class="governance-cell"><span class="eyebrow eyebrow-teal">Reprice needed</span>'
+            f'<strong>{len(reprice_needed)}</strong><span class="card-sub">Supplier cost or margin guardrail</span></div>'
+            f'<div class="governance-cell"><span class="eyebrow eyebrow-teal">Replacement gaps</span>'
+            f'<strong>{len(replacement_gaps)}</strong><span class="card-sub">Old SKUs still quoted</span></div>'
+            f'<div class="governance-cell"><span class="eyebrow eyebrow-teal">Critical</span>'
+            f'<strong>{len(critical_governance)}</strong><span class="card-sub">Needs owner action</span></div>'
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+
+        flow_html = (
+            '<div class="governance-flow">'
+            '<div class="governance-step"><span class="governance-step-num">01 · ingest</span>'
+            '<div class="governance-step-title">Read source signals</div>'
+            '<p class="governance-step-copy">PIM, supplier file, pricing master, stock, and classification reference.</p></div>'
+            '<div class="governance-step"><span class="governance-step-num">02 · compare</span>'
+            '<div class="governance-step-title">Find contradictions</div>'
+            '<p class="governance-step-copy">Material, category, origin, packaging, and lifecycle conflicts.</p></div>'
+            '<div class="governance-step"><span class="governance-step-num">03 · score</span>'
+            '<div class="governance-step-title">Score readiness</div>'
+            '<p class="governance-step-copy">Launch checklist plus cost-change and substitution risk.</p></div>'
+            '<div class="governance-step"><span class="governance-step-num">04 · assign</span>'
+            '<div class="governance-step-title">Route owner</div>'
+            '<p class="governance-step-copy">Catalog, compliance, lifecycle, campaign, or product operations.</p></div>'
+            '<div class="governance-step"><span class="governance-step-num">05 · publish</span>'
+            '<div class="governance-step-title">Release or hold</div>'
+            '<p class="governance-step-copy">Clean products publish. Exceptions create a controlled handoff.</p></div>'
+            "</div>"
+        )
+        st.markdown(flow_html, unsafe_allow_html=True)
+
+        governance_left, governance_right = st.columns([1.15, 1])
+        with governance_left:
+            st.markdown(
+                '<span class="eyebrow">Classification-informed data conflicts</span>',
+                unsafe_allow_html=True,
+            )
+            conflict_rows = ""
+            status_class_map = {
+                "OK": "status-ok",
+                "Review": "status-warning",
+                "Critical": "status-critical",
+            }
+            for row in conflicts.head(8).itertuples():
+                issues = []
+                if row.class_mismatch:
+                    issues.append("class")
+                if row.material_mismatch:
+                    issues.append("material")
+                if row.origin_issue:
+                    issues.append("origin")
+                if row.packaging_mismatch:
+                    issues.append("unit")
+                conflict_rows += (
+                    "<tr>"
+                    f"<td><strong>{row.item_id}</strong><br><span class='check-muted'>{row.product}</span></td>"
+                    f"<td>{row.local_category}<br><span class='check-muted'>{row.local_material} · {row.local_uom}</span></td>"
+                    f"<td>{row.reference_class}<br><span class='check-muted'>{row.reference_code} · {row.reference_material} · {row.reference_packaging}</span></td>"
+                    f"<td>{row.origin_master or 'Missing'} / {row.origin_supplier or 'Missing'}</td>"
+                    f"<td><span class='status-pill {status_class_map[row.governance_status]}'>{row.governance_status}</span><br><span class='check-muted'>{', '.join(issues)}</span></td>"
+                    "</tr>"
+                )
+            st.markdown(
+                "<table class='check-table'><thead><tr>"
+                "<th>Product</th><th>Local master</th><th>Reference signal</th><th>Origin</th><th>Status</th>"
+                f"</tr></thead><tbody>{conflict_rows}</tbody></table>",
+                unsafe_allow_html=True,
+            )
+
+        with governance_right:
+            st.markdown(
+                '<span class="eyebrow">Launch readiness vs cost change</span>',
+                unsafe_allow_html=True,
+            )
+            fig_governance = px.scatter(
+                governance_df,
+                x="cost_change_pct",
+                y="launch_ready_score",
+                size="governance_issue_count",
+                color="workflow_stage",
+                hover_name="product",
+                hover_data={
+                    "item_id": True,
+                    "reference_code": True,
+                    "margin_after_cost_pct": ":.1f",
+                    "sales_quotes_old_sku": True,
+                    "workflow_stage": False,
+                },
+                color_discrete_map={
+                    "Monitor": "#14B8A6",
+                    "Launch readiness": "#F97316",
+                    "Reprice": "#0F766E",
+                    "Data stewardship": "#1B3F47",
+                    "Lifecycle mapping": "#991B1B",
+                },
+            )
+            fig_governance.add_hline(
+                y=80,
+                line_color="#F97316",
+                line_dash="dash",
+                annotation_text="Launch threshold",
+                annotation_font=dict(
+                    family="Geist Mono, monospace", size=10, color="#F97316"
+                ),
+            )
+            fig_governance.add_vline(
+                x=10,
+                line_color="#991B1B",
+                line_dash="dash",
+                annotation_text="Cost-change review",
+                annotation_font=dict(
+                    family="Geist Mono, monospace", size=10, color="#991B1B"
+                ),
+            )
+            _apply_theme(fig_governance)
+            fig_governance.update_layout(
+                title_text="Governance risk map",
+                height=360,
+                legend=dict(
+                    font=dict(family="Geist Mono, monospace", size=10),
+                    title_text="",
+                ),
+                xaxis_title="Supplier cost change %",
+                yaxis_title="Launch readiness score",
+            )
+            st.plotly_chart(fig_governance, width="stretch")
+
+        st.markdown(
+            "<hr style='border:0;border-top:1px solid #0A1F24;margin:32px 0 24px;'>",
+            unsafe_allow_html=True,
+        )
+        gov_queue_col, gov_payload_col = st.columns([1.3, 1])
+        with gov_queue_col:
+            st.markdown(
+                '<span class="eyebrow">Owner workflow queue</span>',
+                unsafe_allow_html=True,
+            )
+            workflow_queue = governance_df[governance_df["governance_status"].ne("OK")][
+                [
+                    "governance_status",
+                    "item_id",
+                    "product",
+                    "owner",
+                    "workflow_stage",
+                    "launch_ready_score",
+                    "cost_change_pct",
+                    "margin_after_cost_pct",
+                    "replacement_sku",
+                    "sales_quotes_old_sku",
+                    "recommended_action",
+                ]
+            ].rename(
+                columns={
+                    "governance_status": "Status",
+                    "item_id": "Item",
+                    "product": "Product",
+                    "owner": "Owner",
+                    "workflow_stage": "Stage",
+                    "launch_ready_score": "Launch score",
+                    "cost_change_pct": "Cost change %",
+                    "margin_after_cost_pct": "Margin after cost %",
+                    "replacement_sku": "Replacement",
+                    "sales_quotes_old_sku": "Old-SKU quotes",
+                    "recommended_action": "Action",
+                }
+            )
+            st.dataframe(workflow_queue, width="stretch", hide_index=True)
+
+        with gov_payload_col:
+            st.markdown(
+                '<span class="eyebrow" style="color:#0F766E;">Governance payload</span>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f'<pre class="code-block">{json.dumps(product_governance_payload(governance_df), indent=2)}</pre>',
+                unsafe_allow_html=True,
+            )
+
+    # =========================================================================
+    # TAB 8 · BUCKETS
+    # =========================================================================
+    with tab8:
+        bucket_df = build_inventory_bucket_data()
+        bucket_summary = (
+            bucket_df.groupby(["bucket", "bucket_name"], as_index=False)
+            .agg(
+                items=("item_id", "count"),
+                stock_units=("current_stock", "sum"),
+                inventory_value=("inventory_value", "sum"),
+                weekly_velocity=("weekly_velocity", "sum"),
+            )
+            .sort_values("bucket")
+        )
+        fast_items = bucket_df[bucket_df["bucket"].eq("A")]
+        stale_items = bucket_df[bucket_df["bucket"].eq("D")]
+        total_value = float(bucket_df["inventory_value"].sum())
+        stale_value = float(stale_items["inventory_value"].sum())
+        stale_share = stale_value / max(total_value, 1) * 100
+        fast_velocity = float(fast_items["weekly_velocity"].sum())
+
+        st.markdown(
+            '<span class="eyebrow">Product bucketing · inventory velocity</span>'
+            "<h2>A shows fast movers. B and C show the middle. D is <em>stale</em>.</h2>"
+            '<p style="font-size:13px;color:#1B3F47;max-width:620px;line-height:1.5;margin-bottom:24px;">'
+            "This tab turns the inventory ledger into operating buckets. The rule blends recent unit "
+            "movement, sell-through, days on hand, and days since last sale so the demo can show where "
+            "pricing should protect supply, test demand, or clear stale stock.</p>",
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            f'<div class="card-grid">'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">A bucket</span>'
+            f'<p class="card-num">{len(fast_items)}</p><span class="card-sub">{fast_velocity:.0f} units/week · fast movers</span></div>'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">B bucket</span>'
+            f'<p class="card-num">{int(bucket_summary.loc[bucket_summary["bucket"].eq("B"), "items"].sum())}</p><span class="card-sub">Steady movers to maintain</span></div>'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">C bucket</span>'
+            f'<p class="card-num">{int(bucket_summary.loc[bucket_summary["bucket"].eq("C"), "items"].sum())}</p><span class="card-sub">Slow movers to manage</span></div>'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">D stale value</span>'
+            f'<p class="card-num">${stale_value/1000:.1f}k</p><span class="card-sub">{stale_share:.0f}% of stock value</span></div>'
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+
+        bucket_left, bucket_right = st.columns([1.2, 1])
+        with bucket_left:
+            st.markdown(
+                '<span class="eyebrow">Bucket board</span>',
+                unsafe_allow_html=True,
+            )
+            bucket_class = {
+                "A": "status-bucket-a",
+                "B": "status-bucket-b",
+                "C": "status-bucket-c",
+                "D": "status-bucket-d",
+            }
+            bucket_labels = {
+                "A": "A fast movers",
+                "B": "B steady movers",
+                "C": "C slow movers",
+                "D": "D stale stock",
+            }
+            bucket_html = ""
+            for bucket in ["A", "B", "C", "D"]:
+                subset = bucket_df[bucket_df["bucket"].eq(bucket)].sort_values(
+                    "weekly_velocity", ascending=False
+                )
+                units = int(subset["current_stock"].sum())
+                value = float(subset["inventory_value"].sum())
+                bucket_html += (
+                    '<div class="bucket-lane">'
+                    '<div class="bucket-lane-head">'
+                    f'<span class="bucket-lane-title"><span class="status-pill {bucket_class[bucket]}">{bucket}</span> {bucket_labels[bucket]}</span>'
+                    f'<span class="bucket-lane-meta">{len(subset)} SKUs · {units:,} units · ${value/1000:.1f}k</span>'
+                    "</div>"
+                )
+                for row in subset.itertuples():
+                    bucket_html += (
+                        '<div class="bucket-sku">'
+                        f"<div><strong>{row.item_id}</strong><br><span class='check-muted'>{row.product}</span></div>"
+                        f'<div><span class="bucket-measure">Velocity</span><br>{row.weekly_velocity:.1f}/wk</div>'
+                        f'<div><span class="bucket-measure">On hand</span><br>{int(row.current_stock):,}</div>'
+                        f'<div><span class="bucket-measure">Last sale</span><br>{int(row.days_since_sale)}d</div>'
+                        "</div>"
+                    )
+                bucket_html += "</div>"
+            st.markdown(bucket_html, unsafe_allow_html=True)
+
+        with bucket_right:
+            st.markdown(
+                '<span class="eyebrow">Velocity vs stock value</span>',
+                unsafe_allow_html=True,
+            )
+            fig_bucket = px.scatter(
+                bucket_df,
+                x="inventory_value",
+                y="weekly_velocity",
+                size="current_stock",
+                color="bucket_name",
+                hover_name="product",
+                hover_data={
+                    "item_id": True,
+                    "current_stock": True,
+                    "days_on_hand": True,
+                    "days_since_sale": True,
+                    "inventory_value": ":$,.0f",
+                    "weekly_velocity": ":.1f",
+                    "bucket_name": False,
+                },
+                color_discrete_map={
+                    "A fast": "#14B8A6",
+                    "B steady": "#1B3F47",
+                    "C slow": "#F97316",
+                    "D stale": "#991B1B",
+                },
+                category_orders={
+                    "bucket_name": ["A fast", "B steady", "C slow", "D stale"]
+                },
+            )
+            _apply_theme(fig_bucket)
+            fig_bucket.update_layout(
+                title_text="Stock tied up by movement bucket",
+                height=360,
+                legend=dict(
+                    font=dict(family="Geist Mono, monospace", size=10),
+                    title_text="",
+                ),
+                xaxis_title="Inventory value",
+                yaxis_title="Units/week",
+            )
+            fig_bucket.update_xaxes(tickprefix="$", separatethousands=True)
+            st.plotly_chart(fig_bucket, width="stretch")
+
+            st.markdown(
+                '<div style="background:#EAE5DA;border:1px solid #0A1F24;padding:20px;margin-top:18px;">'
+                '<span class="eyebrow" style="color:#0F766E;">Bucket action</span>'
+                "<p style=\"font-family:'Instrument Serif',serif;font-size:32px;line-height:0.95;letter-spacing:-0.02em;margin:8px 0;\">"
+                "Clear D before buying more C</p>"
+                '<p style="font-size:13px;color:#1B3F47;line-height:1.5;margin:0;">'
+                "A items need availability protection. B items are stable enough for normal replenishment. "
+                "C items need tighter buys or bundles. D items should be marked down, returned, or removed.</p></div>",
+                unsafe_allow_html=True,
+            )
+
+        st.markdown(
+            "<hr style='border:0;border-top:1px solid #0A1F24;margin:32px 0 24px;'>",
+            unsafe_allow_html=True,
+        )
+        bucket_table_col, bucket_payload_col = st.columns([1.25, 1])
+        with bucket_table_col:
+            st.markdown(
+                '<span class="eyebrow">Bucket detail</span>',
+                unsafe_allow_html=True,
+            )
+            detail = bucket_df[
+                [
+                    "bucket_name",
+                    "item_id",
+                    "product",
+                    "category",
+                    "current_stock",
+                    "weekly_velocity",
+                    "sell_through_28d",
+                    "days_on_hand",
+                    "days_since_sale",
+                    "action",
+                ]
+            ].rename(
+                columns={
+                    "bucket_name": "Bucket",
+                    "item_id": "Item",
+                    "product": "Product",
+                    "category": "Category",
+                    "current_stock": "Stock",
+                    "weekly_velocity": "Units/week",
+                    "sell_through_28d": "28d sell-through %",
+                    "days_on_hand": "Days on hand",
+                    "days_since_sale": "Days since sale",
+                    "action": "Action",
+                }
+            )
+            st.dataframe(detail, width="stretch", hide_index=True)
+
+        with bucket_payload_col:
+            st.markdown(
+                '<span class="eyebrow" style="color:#0F766E;">Bucket payload</span>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f'<pre class="code-block">{json.dumps(inventory_bucket_payload(bucket_df), indent=2)}</pre>',
+                unsafe_allow_html=True,
+            )
+
+    # =========================================================================
+    # TAB 9 · STOCK FORECAST
+    # =========================================================================
+    with tab9:
         stock_items, demand_history = build_stock_forecast_data()
         item_labels = {
             f"{row.product} ({row.item_id})": row.item_id for row in stock_items.itertuples()
@@ -2282,9 +3832,9 @@ def main():
             )
 
     # =========================================================================
-    # TAB 7 · HANDOFF
+    # TAB 10 · HANDOFF
     # =========================================================================
-    with tab7:
+    with tab10:
         st.markdown(
             '<span class="eyebrow">Automation handoff · JSON payload</span>'
             "<h2>From a <em>recommendation</em> to a workflow step.</h2>"
