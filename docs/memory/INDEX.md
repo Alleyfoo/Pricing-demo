@@ -1,6 +1,6 @@
 ﻿# Memory Index
 
-> Topic navigation for Pricing Demo.
+> Topic navigation for the Pricing and Product Operations Demo.
 
 ## Decisions
 

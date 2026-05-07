@@ -1,6 +1,6 @@
 ﻿# Project Memory
 
-> Curated knowledge base for Pricing Demo.
+> Curated knowledge base for the Pricing and Product Operations Demo.
 
 ## Purpose
 

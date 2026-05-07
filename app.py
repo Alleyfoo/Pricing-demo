@@ -3,7 +3,7 @@ import hashlib
 import math
 import time as _time
 from dataclasses import dataclass
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta, timezone
 
 import numpy as np
 import pandas as pd
@@ -19,7 +19,7 @@ try:
 except Exception:
     Prophet = None
 
-st.set_page_config(page_title="Service Pricing Automation Demo", layout="wide")
+st.set_page_config(page_title="Pricing and Product Operations Demo", layout="wide")
 
 # ── Design system CSS ─────────────────────────────────────────────────────────
 st.html(
@@ -333,6 +333,17 @@ h3 {
 .governance-step-num { font-family: var(--mono); font-size: 10px; color: var(--teal-dim); letter-spacing: 0.1em; text-transform: uppercase; }
 .governance-step-title { font-weight: 600; font-size: 13px; margin: 8px 0 5px; color: var(--ink); }
 .governance-step-copy { font-size: 12.5px; line-height: 1.4; color: var(--ink-3); margin: 0; }
+.overview-hero { border-bottom: 1px solid var(--ink); padding: 0 0 24px; margin-bottom: 0; }
+.overview-copy { font-size: 15px; line-height: 1.55; color: var(--ink-3); max-width: 760px; margin: 0; }
+.overview-map { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1px; background: var(--ink); border: 1px solid var(--ink); margin: 28px 0; }
+.overview-card { background: var(--paper); min-height: 156px; padding: 18px 16px; }
+.overview-card strong { display: block; font-family: var(--serif); font-size: 25px; line-height: 1; letter-spacing: -0.02em; font-weight: 400; margin: 8px 0 8px; color: var(--ink); }
+.overview-card p { color: var(--ink-3); font-size: 13px; line-height: 1.45; margin: 0; }
+.overview-card .status-pill { min-width: 0; }
+.overview-principles { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1px; background: var(--ink); border: 1px solid var(--ink); margin-bottom: 28px; }
+.overview-principle { background: var(--paper-2); padding: 18px 16px; min-height: 132px; }
+.overview-principle h3 { font-family: var(--mono) !important; font-size: 11px !important; letter-spacing: 0.1em !important; text-transform: uppercase !important; margin: 0 0 8px !important; color: var(--teal-dim) !important; }
+.overview-principle p { font-size: 13px; line-height: 1.45; color: var(--ink-3); margin: 0; }
 .check-table { width: 100%; border-collapse: collapse; border: 1px solid var(--ink); font-size: 13px; }
 .check-table th { background: var(--paper-2); font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--ink); }
 .check-table td { padding: 11px 12px; border-bottom: 1px solid var(--paper-3); vertical-align: top; }
@@ -1916,7 +1927,7 @@ def _apply_theme(fig: go.Figure, dark: bool = False) -> go.Figure:
 def main():
     # ── Sidebar ───────────────────────────────────────────────────────────────
     st.sidebar.markdown(
-        '<div class="brand-mark">Pricing<em>·</em>Demo</div>'
+        '<div class="brand-mark">Ops<em>·</em>Cockpit</div>'
         '<div style="font-family:var(--mono);font-size:10px;letter-spacing:0.1em;'
         "text-transform:uppercase;color:#DDD6C5;margin-top:2px;margin-bottom:18px;"
         'padding-bottom:18px;border-bottom:1px solid #1B3F47;">v0.4</div>',
@@ -1930,6 +1941,12 @@ def main():
 
     df = generate_synthetic_data(n_rows=row_count)
     models = build_models(df)
+    run_date = date.today()
+    run_date_display = run_date.isoformat()
+    run_id = run_date.strftime("%Y-%m-%d")
+    generated_at = (
+        datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    )
 
     scenario_presets = {
         "Market-aligned": {
@@ -2040,7 +2057,7 @@ def main():
     st.sidebar.markdown(
         '<div style="margin-top:24px;padding-top:16px;border-top:1px solid #1B3F47;'
         'font-family:var(--mono);font-size:10px;letter-spacing:0.05em;color:#DDD6C5;line-height:1.6;">'
-        f"Synthetic data · {row_count} rows<br>Last trained 04·29·2026<br>Model · GBM quantile band</div>",
+        f"Synthetic data · {row_count} rows<br>Refreshed {run_date_display}<br>Model · GBM quantile band</div>",
         unsafe_allow_html=True,
     )
 
@@ -2089,15 +2106,16 @@ def main():
         '<div style="display:flex;align-items:center;justify-content:space-between;'
         'padding:18px 0 18px;border-bottom:1px solid #0A1F24;margin-bottom:0;">'
         '<span style="font-family:var(--mono);font-size:11px;letter-spacing:0.14em;text-transform:uppercase;">'
-        "<strong>Pricing Demo</strong> &nbsp;/&nbsp; Service quote sandbox</span>"
-        '<span class="topbar-meta"><span class="dot"></span>LIVE &nbsp;&nbsp; RUN · #2026-04-29-A</span>'
+        "<strong>Operations Demo</strong> &nbsp;/&nbsp; Pricing · Product · Inventory cockpit</span>"
+        f'<span class="topbar-meta"><span class="dot"></span>LIVE &nbsp;&nbsp; RUN · #{run_id}-A</span>'
         "</div>",
         unsafe_allow_html=True,
     )
 
     # ── Tabs ──────────────────────────────────────────────────────────────────
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs(
+    tab0, tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs(
         [
+            "Overview",
             "Quote",
             "Data",
             "History",
@@ -2114,6 +2132,121 @@ def main():
     # =========================================================================
     # TAB 1 · QUOTE
     # =========================================================================
+    with tab0:
+        product_checks = build_product_pricing_checks()
+        health_df = build_product_health_data()
+        governance_df = build_product_governance_data()
+        bucket_df = build_inventory_bucket_data()
+        quote_review_label = "Review required" if review_required else "Quote ready"
+        operational_issues = int(
+            product_checks["status"].ne("OK").sum()
+            + health_df["issue_count"].gt(0).sum()
+            + governance_df["governance_status"].ne("OK").sum()
+            + bucket_df["bucket"].eq("D").sum()
+        )
+        stale_value = float(bucket_df.loc[bucket_df["bucket"].eq("D"), "inventory_value"].sum())
+        critical_health = int(health_df["health_status"].eq("Critical").sum())
+
+        st.markdown(
+            '<div class="overview-hero">'
+            '<span class="eyebrow">Daily operating cockpit · synthetic demo</span>'
+            "<h1>Pricing is only one part of the product operating loop.</h1>"
+            '<p class="overview-copy">'
+            "This demo started as a service-pricing tool, then expanded into the surrounding daily work: "
+            "product setup, health checks, governance conflicts, inventory velocity, stock readiness, and "
+            "handoff payloads. The point is to show how teams could review exceptions and trigger workflows "
+            "without presenting this as a full enterprise data-platform replacement.</p>"
+            "</div>",
+            unsafe_allow_html=True,
+        )
+
+        quote_status_class = "status-warning" if review_required else "status-ok"
+        st.markdown(
+            f'<div class="card-grid">'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">Quote state</span>'
+            f'<p class="card-num" style="font-size:34px;"><span class="status-pill {quote_status_class}">{quote_review_label}</span></p>'
+            f'<span class="card-sub">{_fmt(recommended_price)} recommended service quote</span></div>'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">Exception count</span>'
+            f'<p class="card-num">{operational_issues}</p><span class="card-sub">Across product setup, health, governance, and stale stock</span></div>'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">Critical health</span>'
+            f'<p class="card-num">{critical_health}</p><span class="card-sub">Products needing immediate owner action</span></div>'
+            f'<div class="card-item"><span class="eyebrow eyebrow-teal">Stale stock value</span>'
+            f'<p class="card-num">${stale_value/1000:.1f}k</p><span class="card-sub">D bucket inventory to clear or retire</span></div>'
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+
+        overview_cards = [
+            ("01", "Quote", "Recommended service price, model band, market signal, and review flag."),
+            ("02", "Data", "Source map for CRM, ERP, supplier costs, catalog rules, and feedback loops."),
+            ("03", "History", "Synthetic quote history, outliers, trends, and data-readiness context."),
+            ("04", "Why", "Pricing rationale: feature importance, calculation components, and review threshold."),
+            ("05", "Product Check", "Product-channel price, validity, and margin checks before publishing."),
+            ("06", "Product Health", "Description gaps, returns/refunds, obsolete stock, scrap candidates, and margin leakage."),
+            ("07", "Governance", "Reference-data contradictions, launch readiness, cost changes, replacements, and owners."),
+            ("08", "Buckets", "A fast movers, B steady movers, C slow movers, and D stale inventory."),
+            ("09", "Stock Forecast", "Demand forecast, projected stock, reorder risk, and replenishment queue."),
+            ("10", "Handoff", "Structured payloads that show how decisions could move into workflow tools."),
+        ]
+        cards_html = ""
+        for step, title, copy in overview_cards:
+            cards_html += (
+                '<div class="overview-card">'
+                f'<span class="status-pill status-info">{step}</span>'
+                f"<strong>{title}</strong>"
+                f"<p>{copy}</p>"
+                "</div>"
+            )
+        st.markdown(f'<div class="overview-map">{cards_html}</div>', unsafe_allow_html=True)
+
+        st.markdown(
+            '<div class="overview-principles">'
+            '<div class="overview-principle"><h3>Scope</h3>'
+            "<p>A focused daily operating tool for campaigns, category reviews, and exception handling. "
+            "Scaling integrations and governance pipelines is a separate architecture topic.</p></div>"
+            '<div class="overview-principle"><h3>Data</h3>'
+            "<p>All data is synthetic. Reference classification fields are used to detect contradictions, "
+            "not to provide customs or tariff advice.</p></div>"
+            '<div class="overview-principle"><h3>Workflow</h3>'
+            "<p>The value is the operating loop: detect, explain, assign, review, and hand off. "
+            "The dashboard is a control surface, not the source system.</p></div>"
+            "</div>",
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            '<span class="eyebrow">Suggested demo path</span>',
+            unsafe_allow_html=True,
+        )
+        st.dataframe(
+            pd.DataFrame(
+                [
+                    {
+                        "Step": "1",
+                        "Open": "Quote",
+                        "Talk track": "Start with a pricing decision and the review rule.",
+                    },
+                    {
+                        "Step": "2",
+                        "Open": "Product Health + Governance",
+                        "Talk track": "Show why product data quality and ownership matter around pricing.",
+                    },
+                    {
+                        "Step": "3",
+                        "Open": "Buckets + Stock Forecast",
+                        "Talk track": "Connect pricing and campaigns to stock movement and availability.",
+                    },
+                    {
+                        "Step": "4",
+                        "Open": "Handoff",
+                        "Talk track": "End with the workflow payload rather than a static dashboard.",
+                    },
+                ]
+            ),
+            width="stretch",
+            hide_index=True,
+        )
+
     with tab1:
         # Hero section
         st.markdown(
@@ -3910,7 +4043,7 @@ def main():
                         "assigned_to": "sales_rep@company.com",
                     },
                     "feedback_hook": "POST /quotes/{quote_id}/outcome  →  triggers model retrain",
-                    "timestamp": "2026-04-29T08:00:00Z",
+                    "timestamp": generated_at,
                 }
                 agent_str = json.dumps(agent_response, indent=2)
                 status_color = "#F97316" if review_required else "#2DD4BF"
@@ -3986,8 +4119,8 @@ def main():
         '<div style="background:#0A1F24;color:#DDD6C5;padding:28px 0;margin-top:0;'
         "font-family:var(--mono);font-size:11px;letter-spacing:0.06em;"
         'display:flex;justify-content:space-between;border-top:1px solid #1B3F47;">'
-        "<span>Pricing Demo · Service quote sandbox</span>"
-        "<span>Synthetic data · for demonstration use only · 04·2026</span></div>",
+        "<span>Operations Demo · pricing, product, and inventory cockpit</span>"
+        f"<span>Synthetic data · for demonstration use only · refreshed {run_date_display}</span></div>",
         unsafe_allow_html=True,
     )
 
