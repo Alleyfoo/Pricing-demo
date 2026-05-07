@@ -1,39 +1,5 @@
 # Minimal Example
 
-> Smallest functional use of the agentic scaffold.
+This folder is a retained scaffold example for lightweight task tracking. It is not part of the Streamlit pricing demo runtime.
 
-## Files
-
-```
-minimal/
-├── README.md
-├── docs/
-│   └── project/
-│       ├── tracker_active.csv
-│       └── tasks/
-│           └── _template.md
-└── scripts/
-    └── tracker.py
-```
-
-## What This Demonstrates
-
-- Single task creation
-- Basic workflow without memory, schemas, or advanced features
-- Minimal viable scaffold usage
-
-## Usage
-
-```bash
-# Create a task
-python scripts/tracker.py new FEAT-001 "My first feature"
-
-# List open tasks
-python scripts/tracker.py open
-```
-
-## When to Use This Pattern
-
-- Quick prototypes
-- Small personal projects
-- Learning the scaffold
+Use it only as a reference if you want a smaller version of the task-tracking structure under `docs/project/`.

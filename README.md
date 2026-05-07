@@ -1,8 +1,8 @@
-# Service Pricing Automation Prototype
+# Pricing And Product Operations Demo
 
-This is a Streamlit prototype for a service-pricing automation concept. It is built as a practical proof point for a Pricing & Cloud Automation Specialist application: how service quote data could be structured, calculated, reviewed, and handed off into automation.
+This is a Streamlit prototype for service pricing and product-management operations. It opens with an overview of the operating cockpit, then shows how quote recommendations, product setup checks, product health, data governance, inventory buckets, stock forecasting, and workflow handoffs could sit together.
 
-The prototype is not a real pricing tool and does not predict actual prices. The historical data is synthetic, and the model demonstrates structure and workflow rather than operational pricing accuracy.
+The app uses synthetic data by design. It is not a real pricing engine, customs classifier, ERP/PIM replacement, or production data-governance system.
 
 ## Live Demo
 
@@ -10,67 +10,28 @@ The prototype is not a real pricing tool and does not predict actual prices. The
 
 ## What It Shows
 
-- Service quote automation from structured job inputs.
-- Pricing drivers: service type, region, season, complexity, material estimate, labour hours, risk, and margin.
-- Transparent rule-based service costing alongside a historical-data ML model.
-- A recommended quote that blends historical reference data, calculation logic, and competitor market pricing.
-- **Market Intel layer** — synthetic competitor price feed shows market position (above / at / below market) and pulls the recommendation toward market median based on a configurable weight.
-- Manual review flag when model and catalog diverge by more than 18%.
-- Simulated automation handoff — shows the outbound JSON payload and a mock agent acknowledgement response.
-- A business-facing flow that sales and quotation teams could understand, test, and improve.
+- **Overview**: purpose of the cockpit, summary metrics, tab map, scope, and suggested demo path.
+- **Quote**: recommended service quote from a blended historical-data model, transparent catalog calculation, and synthetic market signal.
+- **Data**: source-system map, data quality checks, and automation targets.
+- **History**: synthetic historical quotes, outlier checks, and price trends.
+- **Why**: model drivers and pricing rationale.
+- **Product Check**: price, validity-window, channel, and margin checks before publishing product pricing.
+- **Product Health**: master-data quality, returns/refunds, obsolete stock, scrap candidates, and margin leakage.
+- **Governance**: classification-informed validation that detects contradictions between reference data and local product master fields.
+- **Buckets**: A/B/C/D inventory velocity buckets for fast, steady, slow, and stale stock.
+- **Stock Forecast**: demand forecast, projected stock, reorder risk, and replenishment queue.
+- **Handoff**: JSON payloads and simulated acknowledgement from an automation target.
 
-## Screenshots
+## Scope
 
-Add screenshots here after running the app.
+This demo is best understood as a focused operating tool:
 
-Suggested captures:
+- useful for daily exception review,
+- campaign or category management,
+- pricing and product workflow prototyping,
+- and discussion of what should later be integrated or automated.
 
-1. `docs/screenshots/price-suggestion.png` - price band, recommendation, and service calculation build-up.
-2. `docs/screenshots/data-foundation.png` - data sources, quality checks, and automation targets.
-3. `docs/screenshots/why-this-price.png` - pricing drivers and recommendation comparison.
-4. `docs/screenshots/automation-plan.png` - JSON handoff and review rule output.
-
-```md
-![Price suggestion](docs/screenshots/price-suggestion.png)
-![Data foundation](docs/screenshots/data-foundation.png)
-![Why this price](docs/screenshots/why-this-price.png)
-![Automation plan](docs/screenshots/automation-plan.png)
-```
-
-## How The Calculation Works
-
-The app combines two pricing views.
-
-First, it creates synthetic historical service-job data and trains a simple model to produce a low, mid, and high price band. This represents how historical project or quotation data could inform a pricing suggestion when real data is available.
-
-Second, it calculates a transparent service estimate using rule-based costing:
-
-```text
-base service fee
-+ materials estimate * material markup
-+ labour hours * hourly rate
-+ regional adjustment
-+ seasonal adjustment
-+ complexity premium
-+ risk buffer
-+ target margin
-= service calculation price
-```
-
-The final recommendation blends the historical model and the rule-based service calculation. If the recommendation diverges materially from the model estimate, the app flags the quote for manual review.
-
-## Why This Matters
-
-The important part is not the machine learning model by itself. The value is in the operating model:
-
-- knowing which data is needed,
-- making pricing drivers visible,
-- keeping calculation logic explainable,
-- automating repeatable steps,
-- preserving manual review where judgement is needed,
-- and feeding sales outcomes back into future pricing decisions.
-
-This matches the kind of work required in pricing and cloud automation: practical data modelling, service quote logic, workflow automation, and continuous improvement.
+It is not positioned as a six-month data-platform program. A scaled production version would need governed source-system pipelines, ownership workflows, audit logs, access controls, and integrations back to ERP, PIM, CRM, inventory, returns, and ticketing systems.
 
 ## Run Locally
 
@@ -91,9 +52,9 @@ http://localhost:8501
 
 ## Project Notes
 
-- Data is synthetic by design.
+- Data is synthetic.
 - Pricing logic is simplified for demonstration.
-- The app should be connected to real CRM, ERP, project-cost, and sales-feedback data before any production use.
-- The prototype is intended to communicate practical thinking around service pricing automation, not to claim finished pricing expertise or real-world price accuracy.
+- Classification-style product references are used only to detect data contradictions, not to provide customs advice.
+- The prototype is intended to communicate practical workflow thinking, not to claim finished pricing, product-governance, or supply-chain automation.
 
 Additional positioning notes are in [docs/application-positioning.md](docs/application-positioning.md).

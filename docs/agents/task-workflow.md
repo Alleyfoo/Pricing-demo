@@ -1,6 +1,6 @@
 ﻿# Task Workflow
 
-> How work gets done in Pricing Demo.
+> How work gets done in the Pricing and Product Operations Demo.
 
 ## Task Lifecycle
 

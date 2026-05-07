@@ -1,69 +1,19 @@
-﻿# Schema System
+# Schemas
 
-> JSON Schema data contracts for Pricing Demo.
+This directory contains JSON Schema files that came from the project scaffold and can be used for future workflow or API contracts.
 
-## Purpose
+They are not currently required by the Streamlit app runtime. The app runs from [../app.py](../app.py) and generates synthetic demo data in memory.
 
-Schemas define the **shape of data** at system boundaries:
+## Files
 
-- Input validation
-- Internal representations
-- Output contracts
-- Audit trails
+| Schema | Intended use |
+|--------|--------------|
+| `input.schema.json` | Shape for a future external request payload |
+| `normalized_request.schema.json` | Canonical internal request shape |
+| `plan.schema.json` | Execution or workflow plan shape |
+| `output.schema.json` | Result payload shape |
+| `run.schema.json` | Audit/run metadata shape |
 
-## Schema Chain
+## Notes
 
-```
-Input → Normalized Request → Plan → Output → Run (Audit)
-```
-
-| Schema | Stage | Purpose |
-|--------|-------|---------|
-| `input.schema.json` | Entry | Public API surface, user input |
-| `normalized_request.schema.json` | Internal | Canonical form, defaults applied |
-| `plan.schema.json` | Planning | Execution strategy, work slices |
-| `output.schema.json` | Exit | User-visible results |
-| `run.schema.json` | Audit | Complete execution record |
-
-## Using Schemas
-
-### Python
-
-```python
-import json
-import jsonschema
-
-with open("schemas/input.schema.json") as f:
-    schema = json.load(f)
-
-# Validate
-data = {"request_id": "req-123", "source": "cli", "payload": {}}
-jsonschema.validate(data, schema)  # Raises ValidationError if invalid
-```
-
-### TypeScript
-
-```typescript
-import Ajv from "ajv";
-
-const ajv = new Ajv();
-const schema = require("./schemas/input.schema.json");
-const validate = ajv.compile(schema);
-
-const valid = validate(data);
-if (!valid) console.log(validate.errors);
-```
-
-## Schema Versioning
-
-- Major changes: `input-v2.schema.json` alongside `input.schema.json`
-- Minor changes: Add optional fields (backward compatible)
-- Breaking changes: Bump major version, keep old schema for compatibility
-
-## Customization
-
-Replace `pricing-tool-demo` in `$id` fields with your actual project identifier:
-
-```json
-"$id": "https://my-project.local/schemas/input.schema.json"
-```
+If this prototype is later turned into an integrated service, these schemas can be revised around the real API and workflow boundaries. Until then, they are supporting project artifacts rather than the core app architecture.

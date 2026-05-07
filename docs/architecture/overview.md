@@ -1,106 +1,71 @@
-﻿# System Architecture
+# Architecture Overview
 
-> High-level design of Pricing Demo.
+This repository is intentionally small. The app is a Streamlit prototype that demonstrates operating workflows, not a production data platform.
 
-## Overview
+## Runtime Shape
 
-Pricing Demo uses a **data-driven, schema-led architecture** with these layers:
-
-```
-Input → Normalization → Planning → Execution → Output → Audit
-```
-
-## Layers
-
-### 1. Input Layer
-Validates external input against `input.schema.json`.
-
-- CLI arguments
-- API requests
-- File imports
-
-### 2. Normalization Layer
-Resolves defaults, expands aliases, removes ambiguity.
-
-Output: `normalized_request.schema.json` compliant object
-
-### 3. Planning Layer
-Converts request into execution plan.
-
-Output: `plan.schema.json` compliant plan
-
-### 4. Execution Layer
-Runs the plan, produces results.
-
-### 5. Output Layer
-Formats and validates final output against `output.schema.json`.
-
-### 6. Audit Layer
-Captures what happened for reproducibility.
-
-Output: `run.schema.json` compliant artifact bundle
-
-## Data Flow
-
-```
-┌─────────┐     ┌─────────────┐     ┌─────────┐     ┌───────────┐
-│  Input  │────▶│ Normalized  │────▶│  Plan   │────▶│ Execution │
-│         │     │   Request   │     │         │     │           │
-└─────────┘     └─────────────┘     └─────────┘     └─────┬─────┘
-     │                                                    │
-     │              ┌──────────────┐                      │
-     └─────────────▶│  Validation  │◀─────────────────────┘
-                    │   (schema)   │
-                    └──────────────┘
-                                          │
-                                          ▼
-                                    ┌─────────┐
-                                    │ Output  │
-                                    │   +     │────▶ User
-                                    │  Audit  │
-                                    └─────────┘
+```text
+Synthetic demo data
+        ↓
+Validation and scoring helpers
+        ↓
+Streamlit tabs
+        ↓
+Charts, queues, tables, and JSON payloads
 ```
 
-## Key Principles
+Most implementation lives in [../../app.py](../../app.py). The app builds synthetic datasets in memory, computes pricing and product-operation signals, and renders them as business-facing tabs.
 
-1. **Schema boundaries:** Every layer has a defined JSON Schema contract
-2. **Validation at boundaries:** Input, plan, and output are validated
-3. **Immutable artifacts:** Each stage produces auditable artifacts
-4. **Failure isolation:** Invalid input never reaches execution
+## Main Areas
 
-## Directory Structure
+| Area | Purpose |
+|------|---------|
+| Quote pricing | Service quote recommendation, pricing drivers, market signal, and review rule |
+| Product setup | Product-channel price, validity, and margin checks |
+| Product health | Description quality, returns/refunds, obsolete stock, scrap candidates, and margin leakage |
+| Governance | Reference-data contradictions, launch readiness, cost-change review, replacement mapping, and ownership |
+| Buckets | A/B/C/D inventory velocity classification |
+| Stock forecast | Demand forecast, projected stock, reorder risk, and replenishment queue |
+| Handoff | JSON payloads that demonstrate workflow integration points |
 
+## Data Approach
+
+All data is synthetic and generated inside the app. This keeps the demo portable and safe to run without credentials or source-system access.
+
+In a production version, the synthetic data builders would be replaced by governed inputs from systems such as:
+
+- CRM or quoting tools
+- ERP and cost history
+- PIM or product master
+- supplier files
+- inventory and demand history
+- returns and refund data
+- workflow or ticketing systems
+
+## Scaling Boundary
+
+The prototype is best framed as a daily operating cockpit. It can prove which exceptions matter and which workflows are useful.
+
+Scaling it would be a separate architecture topic involving:
+
+- scheduled pipelines,
+- data ownership and quality rules,
+- access control,
+- audit logs,
+- approval workflows,
+- production APIs,
+- and integration back to source systems.
+
+## Verification
+
+Use this for a basic code check:
+
+```powershell
+python -m py_compile app.py
 ```
-pricing-tool-demo/
-├── input/              # Input validation
-├── normalization/      # Request resolution
-├── planning/           # Plan generation
-├── execution/          # Core logic
-├── output/             # Result formatting
-└── audit/              # Run recording
+
+When the app is running, a local smoke check should return HTTP `200`:
+
+```powershell
+(Invoke-WebRequest -Uri http://localhost:8501 -UseBasicParsing -TimeoutSec 20).StatusCode
 ```
-
-## Schemas
-
-Located in `/schemas/`:
-
-| Schema | Purpose |
-|--------|---------|
-| `input.schema.json` | Public API surface |
-| `normalized_request.schema.json` | Internal canonical form |
-| `plan.schema.json` | Execution plan |
-| `output.schema.json` | User-visible results |
-| `run.schema.json` | Audit bundle |
-
-## Extension Points
-
-- **Input adapters:** Add new input types (webhook, file watcher)
-- **Plan strategies:** Alternative planning algorithms
-- **Output formats:** Add serialization formats
-
-## Technology Choices
-
-- **Schemas:** JSON Schema (language-agnostic)
-- **Validation:** jsonschema (Python), ajv (TypeScript), etc.
-- **Persistence:** CSV + Markdown for project state, JSON for artifacts
-- **Optional:** SQLite for complex relational state
