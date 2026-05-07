@@ -325,6 +325,14 @@ h3 {
 .health-row:last-child { border-bottom: 0; }
 .health-score { font-family: var(--serif); font-size: 26px; line-height: 0.95; letter-spacing: -0.02em; color: var(--ink); }
 .status-info { color: #1B3F47; background: #EAE5DA; }
+.governance-strip { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 1px; background: var(--ink); border: 1px solid var(--ink); margin: 0 0 24px; }
+.governance-cell { background: var(--paper); padding: 16px 14px; min-height: 106px; }
+.governance-cell strong { display: block; font-family: var(--serif); font-size: 30px; line-height: 0.95; letter-spacing: -0.02em; font-weight: 400; margin: 8px 0 4px; }
+.governance-flow { display: grid; grid-template-columns: repeat(5, minmax(130px, 1fr)); gap: 1px; background: var(--ink); border: 1px solid var(--ink); margin-bottom: 24px; }
+.governance-step { background: var(--paper-2); padding: 14px; min-height: 118px; }
+.governance-step-num { font-family: var(--mono); font-size: 10px; color: var(--teal-dim); letter-spacing: 0.1em; text-transform: uppercase; }
+.governance-step-title { font-weight: 600; font-size: 13px; margin: 8px 0 5px; color: var(--ink); }
+.governance-step-copy { font-size: 12.5px; line-height: 1.4; color: var(--ink-3); margin: 0; }
 .check-table { width: 100%; border-collapse: collapse; border: 1px solid var(--ink); font-size: 13px; }
 .check-table th { background: var(--paper-2); font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-3); text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--ink); }
 .check-table td { padding: 11px 12px; border-bottom: 1px solid var(--paper-3); vertical-align: top; }
@@ -1117,6 +1125,390 @@ def product_health_payload(df: pd.DataFrame) -> dict:
 
 
 @st.cache_data
+def build_product_governance_data(today: date | None = None) -> pd.DataFrame:
+    if today is None:
+        today = date.today()
+
+    records = [
+        {
+            "item_id": "PM-100",
+            "product": "Smart valve actuator",
+            "local_category": "Controls",
+            "reference_class": "Valve and flow-control component",
+            "reference_code": "8481.80",
+            "local_material": "Steel",
+            "reference_material": "Steel",
+            "local_uom": "Each",
+            "reference_packaging": "Each",
+            "origin_master": "DE",
+            "origin_supplier": "DE",
+            "lifecycle": "Active",
+            "launch_price": True,
+            "launch_description": True,
+            "launch_image": True,
+            "launch_compliance": True,
+            "launch_stock": True,
+            "old_cost": 112.00,
+            "new_cost": 118.00,
+            "current_price": 169.00,
+            "target_margin_pct": 24.0,
+            "replacement_sku": "",
+            "sales_quotes_old_sku": 0,
+            "owner": "Product ops",
+        },
+        {
+            "item_id": "PM-220",
+            "product": "Filter replacement kit",
+            "local_category": "Maintenance",
+            "reference_class": "Replaceable filtering apparatus part",
+            "reference_code": "8421.99",
+            "local_material": "Paper media",
+            "reference_material": "Paper media",
+            "local_uom": "Kit",
+            "reference_packaging": "Set/kit",
+            "origin_master": "FI",
+            "origin_supplier": "FI",
+            "lifecycle": "Active",
+            "launch_price": True,
+            "launch_description": True,
+            "launch_image": False,
+            "launch_compliance": True,
+            "launch_stock": True,
+            "old_cost": 39.00,
+            "new_cost": 42.50,
+            "current_price": 64.00,
+            "target_margin_pct": 28.0,
+            "replacement_sku": "",
+            "sales_quotes_old_sku": 0,
+            "owner": "Catalog team",
+        },
+        {
+            "item_id": "PM-340",
+            "product": "Sensor calibration bundle",
+            "local_category": "Service parts",
+            "reference_class": "Electronic measuring instrument accessory",
+            "reference_code": "9031.90",
+            "local_material": "Mixed",
+            "reference_material": "Electronic assembly",
+            "local_uom": "Each",
+            "reference_packaging": "Set/kit",
+            "origin_master": "",
+            "origin_supplier": "EE",
+            "lifecycle": "Active",
+            "launch_price": True,
+            "launch_description": False,
+            "launch_image": True,
+            "launch_compliance": False,
+            "launch_stock": True,
+            "old_cost": 68.00,
+            "new_cost": 76.00,
+            "current_price": 112.00,
+            "target_margin_pct": 30.0,
+            "replacement_sku": "",
+            "sales_quotes_old_sku": 0,
+            "owner": "Compliance",
+        },
+        {
+            "item_id": "PM-480",
+            "product": "Weekly promo thermostat",
+            "local_category": "Campaign",
+            "reference_class": "Automatic regulating instrument",
+            "reference_code": "9032.10",
+            "local_material": "Plastic",
+            "reference_material": "Electronic assembly",
+            "local_uom": "Each",
+            "reference_packaging": "Each",
+            "origin_master": "CN",
+            "origin_supplier": "CN",
+            "lifecycle": "Promo",
+            "launch_price": True,
+            "launch_description": True,
+            "launch_image": True,
+            "launch_compliance": False,
+            "launch_stock": True,
+            "old_cost": 72.00,
+            "new_cost": 88.00,
+            "current_price": 119.00,
+            "target_margin_pct": 25.0,
+            "replacement_sku": "",
+            "sales_quotes_old_sku": 0,
+            "owner": "Campaign owner",
+        },
+        {
+            "item_id": "PM-410",
+            "product": "Hydronic balancing valve",
+            "local_category": "Controls",
+            "reference_class": "Valve and flow-control component",
+            "reference_code": "8481.80",
+            "local_material": "Brass",
+            "reference_material": "Base metal",
+            "local_uom": "Each",
+            "reference_packaging": "Each",
+            "origin_master": "IT",
+            "origin_supplier": "IT",
+            "lifecycle": "Active",
+            "launch_price": True,
+            "launch_description": True,
+            "launch_image": True,
+            "launch_compliance": True,
+            "launch_stock": True,
+            "old_cost": 58.00,
+            "new_cost": 64.00,
+            "current_price": 94.00,
+            "target_margin_pct": 26.0,
+            "replacement_sku": "",
+            "sales_quotes_old_sku": 0,
+            "owner": "Product ops",
+        },
+        {
+            "item_id": "PM-515",
+            "product": "Condensate pump kit",
+            "local_category": "Maintenance",
+            "reference_class": "Liquid pump assembly",
+            "reference_code": "8413.70",
+            "local_material": "Plastic",
+            "reference_material": "Electromechanical assembly",
+            "local_uom": "Each",
+            "reference_packaging": "Set/kit",
+            "origin_master": "PL",
+            "origin_supplier": "CZ",
+            "lifecycle": "Active",
+            "launch_price": True,
+            "launch_description": False,
+            "launch_image": False,
+            "launch_compliance": False,
+            "launch_stock": True,
+            "old_cost": 43.00,
+            "new_cost": 52.00,
+            "current_price": 72.00,
+            "target_margin_pct": 27.0,
+            "replacement_sku": "",
+            "sales_quotes_old_sku": 0,
+            "owner": "Catalog team",
+        },
+        {
+            "item_id": "PM-730",
+            "product": "Expansion vessel bracket",
+            "local_category": "Install parts",
+            "reference_class": "Base-metal mounting article",
+            "reference_code": "7326.90",
+            "local_material": "Steel",
+            "reference_material": "Steel",
+            "local_uom": "Each",
+            "reference_packaging": "Each",
+            "origin_master": "SE",
+            "origin_supplier": "SE",
+            "lifecycle": "Phase-out",
+            "launch_price": True,
+            "launch_description": True,
+            "launch_image": True,
+            "launch_compliance": True,
+            "launch_stock": True,
+            "old_cost": 15.50,
+            "new_cost": 18.50,
+            "current_price": 28.00,
+            "target_margin_pct": 25.0,
+            "replacement_sku": "PM-731",
+            "sales_quotes_old_sku": 12,
+            "owner": "Product ops",
+        },
+        {
+            "item_id": "PM-760",
+            "product": "Legacy controller faceplate",
+            "local_category": "Legacy",
+            "reference_class": "Plastic enclosure part",
+            "reference_code": "3926.90",
+            "local_material": "Aluminium",
+            "reference_material": "Plastic",
+            "local_uom": "Each",
+            "reference_packaging": "Each",
+            "origin_master": "",
+            "origin_supplier": "CN",
+            "lifecycle": "Phase-out",
+            "launch_price": True,
+            "launch_description": False,
+            "launch_image": False,
+            "launch_compliance": False,
+            "launch_stock": True,
+            "old_cost": 17.00,
+            "new_cost": 21.00,
+            "current_price": 31.00,
+            "target_margin_pct": 24.0,
+            "replacement_sku": "PM-761",
+            "sales_quotes_old_sku": 28,
+            "owner": "Lifecycle owner",
+        },
+        {
+            "item_id": "PM-900",
+            "product": "Discontinued wall sensor",
+            "local_category": "Legacy",
+            "reference_class": "Electronic sensor apparatus",
+            "reference_code": "9026.80",
+            "local_material": "Plastic",
+            "reference_material": "Electronic assembly",
+            "local_uom": "Each",
+            "reference_packaging": "Each",
+            "origin_master": "CN",
+            "origin_supplier": "",
+            "lifecycle": "Discontinued",
+            "launch_price": False,
+            "launch_description": False,
+            "launch_image": False,
+            "launch_compliance": False,
+            "launch_stock": True,
+            "old_cost": 29.00,
+            "new_cost": 36.00,
+            "current_price": 41.00,
+            "target_margin_pct": 22.0,
+            "replacement_sku": "",
+            "sales_quotes_old_sku": 46,
+            "owner": "Lifecycle owner",
+        },
+        {
+            "item_id": "PM-940",
+            "product": "Obsolete mounting rail",
+            "local_category": "Legacy",
+            "reference_class": "Base-metal mounting article",
+            "reference_code": "7326.90",
+            "local_material": "Unknown",
+            "reference_material": "Steel",
+            "local_uom": "Meter",
+            "reference_packaging": "Each",
+            "origin_master": "",
+            "origin_supplier": "",
+            "lifecycle": "Obsolete",
+            "launch_price": False,
+            "launch_description": False,
+            "launch_image": False,
+            "launch_compliance": False,
+            "launch_stock": True,
+            "old_cost": 6.20,
+            "new_cost": 7.50,
+            "current_price": 8.25,
+            "target_margin_pct": 20.0,
+            "replacement_sku": "PM-941",
+            "sales_quotes_old_sku": 18,
+            "owner": "Lifecycle owner",
+        },
+    ]
+
+    df = pd.DataFrame(records)
+    df["as_of"] = today
+    launch_cols = [
+        "launch_price",
+        "launch_description",
+        "launch_image",
+        "launch_compliance",
+        "launch_stock",
+    ]
+    df["launch_ready_score"] = (df[launch_cols].sum(axis=1) / len(launch_cols) * 100).round(0).astype(int)
+    df["class_mismatch"] = ~df.apply(
+        lambda row: str(row.local_category).lower() in str(row.reference_class).lower()
+        or (
+            row.local_category in ["Controls", "Campaign"]
+            and any(term in row.reference_class.lower() for term in ["valve", "instrument"])
+        )
+        or (
+            row.local_category in ["Install parts", "Legacy"]
+            and any(term in row.reference_class.lower() for term in ["mounting", "enclosure", "sensor"])
+        )
+        or (
+            row.local_category == "Maintenance"
+            and any(term in row.reference_class.lower() for term in ["filter", "pump"])
+        ),
+        axis=1,
+    )
+    df["material_mismatch"] = ~df.apply(
+        lambda row: row.local_material == row.reference_material
+        or row.local_material in row.reference_material
+        or row.reference_material in ["Base metal", "Electronic assembly", "Electromechanical assembly"],
+        axis=1,
+    )
+    df["origin_issue"] = (
+        df["origin_master"].eq("")
+        | df["origin_supplier"].eq("")
+        | df["origin_master"].ne(df["origin_supplier"])
+    )
+    df["packaging_mismatch"] = ~df.apply(
+        lambda row: row.local_uom == row.reference_packaging
+        or (row.local_uom == "Kit" and row.reference_packaging == "Set/kit"),
+        axis=1,
+    )
+    df["cost_change_pct"] = ((df["new_cost"] - df["old_cost"]) / df["old_cost"] * 100).round(1)
+    df["margin_after_cost_pct"] = ((df["current_price"] - df["new_cost"]) / df["current_price"] * 100).round(1)
+    df["needs_reprice"] = (
+        (df["cost_change_pct"].abs() >= 10)
+        | (df["margin_after_cost_pct"] < df["target_margin_pct"])
+    )
+    df["replacement_gap"] = (
+        df["lifecycle"].isin(["Phase-out", "Discontinued", "Obsolete"])
+        & (df["sales_quotes_old_sku"] > 0)
+        & (df["replacement_sku"].eq(""))
+    )
+    df["data_conflict_count"] = df[
+        ["class_mismatch", "material_mismatch", "origin_issue", "packaging_mismatch"]
+    ].sum(axis=1)
+    df["governance_issue_count"] = df[
+        [
+            "class_mismatch",
+            "material_mismatch",
+            "origin_issue",
+            "packaging_mismatch",
+            "needs_reprice",
+            "replacement_gap",
+        ]
+    ].sum(axis=1) + (df["launch_ready_score"] < 80).astype(int)
+    df["governance_status"] = "OK"
+    df.loc[df["governance_issue_count"].between(1, 2), "governance_status"] = "Review"
+    df.loc[df["governance_issue_count"].ge(3), "governance_status"] = "Critical"
+    df["workflow_stage"] = "Monitor"
+    df.loc[df["launch_ready_score"] < 80, "workflow_stage"] = "Launch readiness"
+    df.loc[df["needs_reprice"], "workflow_stage"] = "Reprice"
+    df.loc[df["data_conflict_count"].gt(0), "workflow_stage"] = "Data stewardship"
+    df.loc[df["replacement_gap"], "workflow_stage"] = "Lifecycle mapping"
+    df["recommended_action"] = "No governance action needed"
+    df.loc[df["launch_ready_score"] < 80, "recommended_action"] = "Complete launch checklist before channel publish"
+    df.loc[df["needs_reprice"], "recommended_action"] = "Review supplier cost change and reset price floor"
+    df.loc[df["data_conflict_count"].gt(0), "recommended_action"] = "Review local master data against classification reference"
+    df.loc[df["replacement_gap"], "recommended_action"] = "Assign replacement SKU and block old-SKU quoting"
+    return df.sort_values(["governance_issue_count", "cost_change_pct"], ascending=[False, False])
+
+
+def product_governance_payload(df: pd.DataFrame) -> dict:
+    return {
+        "control": "product_data_governance",
+        "source": "synthetic PIM, supplier, and classification reference checks",
+        "classification_note": (
+            "Reference codes are used to detect product-master contradictions; "
+            "they are not treated as binding customs classifications."
+        ),
+        "as_of": str(df["as_of"].iloc[0]),
+        "summary": {
+            "products_checked": int(len(df)),
+            "classification_conflicts": int(df["data_conflict_count"].gt(0).sum()),
+            "launch_not_ready": int((df["launch_ready_score"] < 80).sum()),
+            "reprice_needed": int(df["needs_reprice"].sum()),
+            "replacement_gaps": int(df["replacement_gap"].sum()),
+            "critical_items": int(df["governance_status"].eq("Critical").sum()),
+        },
+        "actions": [
+            {
+                "item_id": row.item_id,
+                "product": row.product,
+                "owner": row.owner,
+                "stage": row.workflow_stage,
+                "status": row.governance_status,
+                "reference_code": row.reference_code,
+                "launch_ready_score": int(row.launch_ready_score),
+                "cost_change_pct": round(float(row.cost_change_pct), 1),
+                "action": row.recommended_action,
+            }
+            for row in df[df["governance_status"].ne("OK")].itertuples()
+        ],
+    }
+
+
+@st.cache_data
 def build_stock_forecast_data(
     today: date | None = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -1704,7 +2096,7 @@ def main():
     )
 
     # ── Tabs ──────────────────────────────────────────────────────────────────
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs(
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs(
         [
             "Quote",
             "Data",
@@ -1712,6 +2104,7 @@ def main():
             "Why",
             "Product Check",
             "Product Health",
+            "Governance",
             "Buckets",
             "Stock Forecast",
             "Handoff",
@@ -2776,9 +3169,215 @@ def main():
             )
 
     # =========================================================================
-    # TAB 7 · BUCKETS
+    # TAB 7 · GOVERNANCE
     # =========================================================================
     with tab7:
+        governance_df = build_product_governance_data()
+        conflicts = governance_df[governance_df["data_conflict_count"].gt(0)]
+        launch_not_ready = governance_df[governance_df["launch_ready_score"] < 80]
+        reprice_needed = governance_df[governance_df["needs_reprice"]]
+        replacement_gaps = governance_df[governance_df["replacement_gap"]]
+        critical_governance = governance_df[governance_df["governance_status"].eq("Critical")]
+
+        st.markdown(
+            '<span class="eyebrow">Product governance · classification-informed validation</span>'
+            "<h2>Use reference data to find contradictions, then route the product to an owner.</h2>"
+            '<p style="font-size:13px;color:#1B3F47;max-width:700px;line-height:1.5;margin-bottom:24px;">'
+            "This does not claim to classify products for customs. It uses HS-style reference fields as "
+            "a governance signal: if the reference class implies a steel mounting article but the local "
+            "master says unknown material, meter unit, or missing origin, the product is held for review. "
+            "The same view covers launch readiness, supplier cost changes, replacement mapping, and workflow ownership.</p>",
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            f'<div class="governance-strip">'
+            f'<div class="governance-cell"><span class="eyebrow eyebrow-teal">Conflicts</span>'
+            f'<strong>{len(conflicts)}</strong><span class="card-sub">Classification reference vs local master</span></div>'
+            f'<div class="governance-cell"><span class="eyebrow eyebrow-teal">Launch not ready</span>'
+            f'<strong>{len(launch_not_ready)}</strong><span class="card-sub">Missing price, content, compliance, or stock</span></div>'
+            f'<div class="governance-cell"><span class="eyebrow eyebrow-teal">Reprice needed</span>'
+            f'<strong>{len(reprice_needed)}</strong><span class="card-sub">Supplier cost or margin guardrail</span></div>'
+            f'<div class="governance-cell"><span class="eyebrow eyebrow-teal">Replacement gaps</span>'
+            f'<strong>{len(replacement_gaps)}</strong><span class="card-sub">Old SKUs still quoted</span></div>'
+            f'<div class="governance-cell"><span class="eyebrow eyebrow-teal">Critical</span>'
+            f'<strong>{len(critical_governance)}</strong><span class="card-sub">Needs owner action</span></div>'
+            f"</div>",
+            unsafe_allow_html=True,
+        )
+
+        flow_html = (
+            '<div class="governance-flow">'
+            '<div class="governance-step"><span class="governance-step-num">01 · ingest</span>'
+            '<div class="governance-step-title">Read source signals</div>'
+            '<p class="governance-step-copy">PIM, supplier file, pricing master, stock, and classification reference.</p></div>'
+            '<div class="governance-step"><span class="governance-step-num">02 · compare</span>'
+            '<div class="governance-step-title">Find contradictions</div>'
+            '<p class="governance-step-copy">Material, category, origin, packaging, and lifecycle conflicts.</p></div>'
+            '<div class="governance-step"><span class="governance-step-num">03 · score</span>'
+            '<div class="governance-step-title">Score readiness</div>'
+            '<p class="governance-step-copy">Launch checklist plus cost-change and substitution risk.</p></div>'
+            '<div class="governance-step"><span class="governance-step-num">04 · assign</span>'
+            '<div class="governance-step-title">Route owner</div>'
+            '<p class="governance-step-copy">Catalog, compliance, lifecycle, campaign, or product operations.</p></div>'
+            '<div class="governance-step"><span class="governance-step-num">05 · publish</span>'
+            '<div class="governance-step-title">Release or hold</div>'
+            '<p class="governance-step-copy">Clean products publish. Exceptions create a controlled handoff.</p></div>'
+            "</div>"
+        )
+        st.markdown(flow_html, unsafe_allow_html=True)
+
+        governance_left, governance_right = st.columns([1.15, 1])
+        with governance_left:
+            st.markdown(
+                '<span class="eyebrow">Classification-informed data conflicts</span>',
+                unsafe_allow_html=True,
+            )
+            conflict_rows = ""
+            status_class_map = {
+                "OK": "status-ok",
+                "Review": "status-warning",
+                "Critical": "status-critical",
+            }
+            for row in conflicts.head(8).itertuples():
+                issues = []
+                if row.class_mismatch:
+                    issues.append("class")
+                if row.material_mismatch:
+                    issues.append("material")
+                if row.origin_issue:
+                    issues.append("origin")
+                if row.packaging_mismatch:
+                    issues.append("unit")
+                conflict_rows += (
+                    "<tr>"
+                    f"<td><strong>{row.item_id}</strong><br><span class='check-muted'>{row.product}</span></td>"
+                    f"<td>{row.local_category}<br><span class='check-muted'>{row.local_material} · {row.local_uom}</span></td>"
+                    f"<td>{row.reference_class}<br><span class='check-muted'>{row.reference_code} · {row.reference_material} · {row.reference_packaging}</span></td>"
+                    f"<td>{row.origin_master or 'Missing'} / {row.origin_supplier or 'Missing'}</td>"
+                    f"<td><span class='status-pill {status_class_map[row.governance_status]}'>{row.governance_status}</span><br><span class='check-muted'>{', '.join(issues)}</span></td>"
+                    "</tr>"
+                )
+            st.markdown(
+                "<table class='check-table'><thead><tr>"
+                "<th>Product</th><th>Local master</th><th>Reference signal</th><th>Origin</th><th>Status</th>"
+                f"</tr></thead><tbody>{conflict_rows}</tbody></table>",
+                unsafe_allow_html=True,
+            )
+
+        with governance_right:
+            st.markdown(
+                '<span class="eyebrow">Launch readiness vs cost change</span>',
+                unsafe_allow_html=True,
+            )
+            fig_governance = px.scatter(
+                governance_df,
+                x="cost_change_pct",
+                y="launch_ready_score",
+                size="governance_issue_count",
+                color="workflow_stage",
+                hover_name="product",
+                hover_data={
+                    "item_id": True,
+                    "reference_code": True,
+                    "margin_after_cost_pct": ":.1f",
+                    "sales_quotes_old_sku": True,
+                    "workflow_stage": False,
+                },
+                color_discrete_map={
+                    "Monitor": "#14B8A6",
+                    "Launch readiness": "#F97316",
+                    "Reprice": "#0F766E",
+                    "Data stewardship": "#1B3F47",
+                    "Lifecycle mapping": "#991B1B",
+                },
+            )
+            fig_governance.add_hline(
+                y=80,
+                line_color="#F97316",
+                line_dash="dash",
+                annotation_text="Launch threshold",
+                annotation_font=dict(
+                    family="Geist Mono, monospace", size=10, color="#F97316"
+                ),
+            )
+            fig_governance.add_vline(
+                x=10,
+                line_color="#991B1B",
+                line_dash="dash",
+                annotation_text="Cost-change review",
+                annotation_font=dict(
+                    family="Geist Mono, monospace", size=10, color="#991B1B"
+                ),
+            )
+            _apply_theme(fig_governance)
+            fig_governance.update_layout(
+                title_text="Governance risk map",
+                height=360,
+                legend=dict(
+                    font=dict(family="Geist Mono, monospace", size=10),
+                    title_text="",
+                ),
+                xaxis_title="Supplier cost change %",
+                yaxis_title="Launch readiness score",
+            )
+            st.plotly_chart(fig_governance, width="stretch")
+
+        st.markdown(
+            "<hr style='border:0;border-top:1px solid #0A1F24;margin:32px 0 24px;'>",
+            unsafe_allow_html=True,
+        )
+        gov_queue_col, gov_payload_col = st.columns([1.3, 1])
+        with gov_queue_col:
+            st.markdown(
+                '<span class="eyebrow">Owner workflow queue</span>',
+                unsafe_allow_html=True,
+            )
+            workflow_queue = governance_df[governance_df["governance_status"].ne("OK")][
+                [
+                    "governance_status",
+                    "item_id",
+                    "product",
+                    "owner",
+                    "workflow_stage",
+                    "launch_ready_score",
+                    "cost_change_pct",
+                    "margin_after_cost_pct",
+                    "replacement_sku",
+                    "sales_quotes_old_sku",
+                    "recommended_action",
+                ]
+            ].rename(
+                columns={
+                    "governance_status": "Status",
+                    "item_id": "Item",
+                    "product": "Product",
+                    "owner": "Owner",
+                    "workflow_stage": "Stage",
+                    "launch_ready_score": "Launch score",
+                    "cost_change_pct": "Cost change %",
+                    "margin_after_cost_pct": "Margin after cost %",
+                    "replacement_sku": "Replacement",
+                    "sales_quotes_old_sku": "Old-SKU quotes",
+                    "recommended_action": "Action",
+                }
+            )
+            st.dataframe(workflow_queue, width="stretch", hide_index=True)
+
+        with gov_payload_col:
+            st.markdown(
+                '<span class="eyebrow" style="color:#0F766E;">Governance payload</span>',
+                unsafe_allow_html=True,
+            )
+            st.markdown(
+                f'<pre class="code-block">{json.dumps(product_governance_payload(governance_df), indent=2)}</pre>',
+                unsafe_allow_html=True,
+            )
+
+    # =========================================================================
+    # TAB 8 · BUCKETS
+    # =========================================================================
+    with tab8:
         bucket_df = build_inventory_bucket_data()
         bucket_summary = (
             bucket_df.groupby(["bucket", "bucket_name"], as_index=False)
@@ -2971,9 +3570,9 @@ def main():
             )
 
     # =========================================================================
-    # TAB 8 · STOCK FORECAST
+    # TAB 9 · STOCK FORECAST
     # =========================================================================
-    with tab8:
+    with tab9:
         stock_items, demand_history = build_stock_forecast_data()
         item_labels = {
             f"{row.product} ({row.item_id})": row.item_id for row in stock_items.itertuples()
@@ -3233,9 +3832,9 @@ def main():
             )
 
     # =========================================================================
-    # TAB 9 · HANDOFF
+    # TAB 10 · HANDOFF
     # =========================================================================
-    with tab9:
+    with tab10:
         st.markdown(
             '<span class="eyebrow">Automation handoff · JSON payload</span>'
             "<h2>From a <em>recommendation</em> to a workflow step.</h2>"
