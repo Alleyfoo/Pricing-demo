@@ -1,8 +1,9 @@
-# Pricing And Product Operations Demo
+# Product Operations Cockpit
 
-This is a Streamlit prototype for service pricing and product-management operations. It opens with an overview of the operating cockpit, then shows how quote recommendations, product setup checks, product health, data governance, inventory buckets, stock forecasting, and workflow handoffs could sit together.
+A synthetic Streamlit demo showing how pricing, product setup, master data quality, governance, inventory risk, stock forecasting, and workflow handoff can be reviewed in one operating surface.
+This demo uses synthetic data. The business logic is the point.
 
-The app uses synthetic data by design. It is not a real pricing engine, customs classifier, ERP/PIM replacement, or production data-governance system.
+The goal is not to build a full enterprise platform. The goal is to demonstrate an operating model: detect exceptions, explain why they matter, review them consistently, and produce clear handoff payloads for the next system or team.
 
 ## Live Demo
 
